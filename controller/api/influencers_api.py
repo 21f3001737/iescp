@@ -6,7 +6,7 @@ from controller.api.utils.request_parser import create_influencer_parser
 
 class InfluencersAPI(Resource):
     def delete(self, influencer_id):
-        influencer = db.session.query(influencers).filter(influencers.id == influencer_id).first()
+        influencer = db.session.query(Influencers).filter(Influencers.id == influencer_id).first()
         if influencer:
             db.session.delete(influencer)
             db.session.commit()
@@ -15,7 +15,7 @@ class InfluencersAPI(Resource):
 
     @marshal_with(influencer_output)
     def get(self, influencer_id):
-        influencer = db.session.query(influencers).filter(influencers.id == influencer_id).first()
+        influencer = db.session.query(Influencers).filter(Influencers.id == influencer_id).first()
         if influencer:
             return influencer
         else:
