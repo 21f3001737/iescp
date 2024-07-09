@@ -31,7 +31,6 @@ ad_request_output = {
     "influencer_id": fields.Integer,
     "messages": fields.String,
     "requirements": fields.String,
-    "payment_amount": fields.Numeric,
+    "payment_amount": fields.Float,
     "status": fields.Integer,
-        
 }
