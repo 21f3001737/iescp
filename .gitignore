@@ -4,3 +4,5 @@ venv
 *.py[cod]
 
 **/*.db/
+
+controller/api/
