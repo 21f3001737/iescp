@@ -26,5 +26,7 @@ app, api, bootstrap = setup_app()
 
 with app.app_context():
     from controller.base import *
+    from controller.sponsor import *
+    from controller.influencer import *
     if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8099)

@@ -7,7 +7,7 @@ from flask import (
         flash,
     )
 from flask import render_template
-from model.db import db
+from model.db import db, Influencers
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, 
@@ -35,6 +35,14 @@ def register_influencer():
         influencer_form = RegisterInfluencer()
         return render_template("form.html",title="Influencer Registration", form = influencer_form, login=False)
     elif request.method == "POST":
-        pass
+        if influencer_form.validate_on_submit():
+            if influencer_form.password.data == influencer_form.repeat_password.data:
+                influencer = influencers()
+                influencer_form.populate_obj(influencer)
+                db.session.add(influencer)
+                db.session.commit()            
+                return "Success"
+            return "Passwords dont match"
+        return "Validation Failed"
     else:
-        pass
+        return "Error Page"

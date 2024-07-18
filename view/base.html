@@ -22,10 +22,16 @@
       <ul class="navbar-nav me-auto">
      {{ render_nav_item('login', 'Home') }}
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-sm-2" type="search" placeholder="Search">
-        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-      </form>
+    {%if 'username' in session.keys()%}
+    <li class="nav-item">
+      <a class="nav-link" href="#">{{session['username']}}</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+    </li>
+    {%else%}
+    {{render_nav_item('login', 'Login')}}
+    {%endif%}
     </div>
   </div>
 </nav>
