@@ -25,17 +25,20 @@ class InfluencersAPI(Resource):
     def post(self, influencer_id):
         args = create_influencer_parser.parse_args()
         name = args.get("name", str)
+        username = args.get("username", str)
         category = args.get("category", str)
         budget = args.get("budget", float)
 
         if name is None:
             raise CreationError(status_code = 400, object_type = "influencer", status_message="Name is required", error_code= "SC1001")
+        if username is None:
+            raise CreationError(status_code = 400, object_type = "influencer", status_message="Username is required", error_code= "SC1002")
         elif category is None:
-            raise CreationError(status_code = 400, object_type = "influencer", status_message="Category is required", error_code= "SC1002")
+            raise CreationError(status_code = 400, object_type = "influencer", status_message="Category is required", error_code= "SC1003")
         elif budget is None:
-            raise CreationError(status_code = 400, object_type = "influencer", status_message="Budget is required", error_code= "SC1003")
+            raise CreationError(status_code = 400, object_type = "influencer", status_message="Budget is required", error_code= "SC1004")
         else:
-            influencer = Influencers(name=name, industry = industry, budget = budget)
+            influencer = Influencers(name=name, username= username, industry = industry, budget = budget)
             db.session.add(influencer)
             db.session.commit()
             return influencer
