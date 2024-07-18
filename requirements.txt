@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 flask-restful
 flask-cors
 bootstrap-flask
+flask-wtf
