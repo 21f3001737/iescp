@@ -4,6 +4,7 @@ from flask_cors import CORS
 from flask_restful import Api
 from model.db import db
 from controller.api.sponsors_api import SponsorsAPI
+from flask_bootstrap import Bootstrap5
 
 def setup_app():
     app = Flask(__name__, template_folder="view")
@@ -11,9 +12,10 @@ def setup_app():
     db.init_app(app)
     api = Api(app)
     CORS(app, resources={r"/*": {"origins": "*"}})
-    return app, api
+    bootstrap = Bootstrap5(app)
+    return app, api, bootstrap
 
-app, api = setup_app()
+app, api, bootstrap = setup_app()
 
 with app.app_context():
     db.create_all()
