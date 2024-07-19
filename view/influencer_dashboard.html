@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+    {% from 'bootstrap5/nav.html' import render_nav_item %}
+
+     {{ render_nav_item('influencer_dashboard', 'Dashboard') }}
+     {{ render_nav_item('influencer_find', 'Find') }}
+     {{ render_nav_item('influencer_stats', 'Stats') }}
+{% endblock %}
+
+{% block content %}
+<div class="hstack gap-2">
+<div class= "vstack gap-4">
+<img class= "rounded" style="max-height: 300px;" src="https://cdn.dribbble.com/users/5534/screenshots/14230133/profile_4x.jpg" />
+</div>
+<div class = "vstack gap-4 mx-5">
+  <div class="display-4"> Welcome {{session['username']}}!</div>
+  <div class="container-md">
+    <div class="display-6"> Ongoing Campaigns:</div>
+<div class="container-md">
+    {% for i in range(4) %}
+      <div class="border hstack gap-3">
+        <div class="h5">Campaign {{i}}</div>
+        <div class="h6">Progress 10%</div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+  <div class="container-md">
+    <div class="display-6"> New Requests:</div>
+    <div class="container-md">
+    {% for i in range(4) %}
+      <div class="border hstack gap-3">
+        <div class="h5">Campaign {{i}}</div>
+        <div class="h6">Progress 10%</div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+</div>
+{% endblock%}

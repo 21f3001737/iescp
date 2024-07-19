@@ -20,7 +20,10 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
     {% from 'bootstrap5/nav.html' import render_nav_item %}
       <ul class="navbar-nav me-auto">
-     {{ render_nav_item('login', 'Home') }}
+     {{ render_nav_item('home', 'Home') }}
+      {% block nav %}
+      
+      {% endblock %}
       </ul>
     {%if 'username' in session.keys()%}
     <li class="nav-item">
@@ -41,6 +44,7 @@
   min-height: 89vh; 
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 </style>
 <div class = "container-fluid vertical-center" >

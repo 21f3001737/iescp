@@ -27,22 +27,44 @@ class RegisterSponsor(FlaskForm):
     industry = StringField('Industry', validators = [validators.input_required()])
     budget = DecimalField('Budget', validators = [validators.input_required()])
     submit = SubmitField('Submit')
-        
-@app.route("/register/sponsor", methods = ["GET", "POST"])
+
+@app.route("/sponsor/register", methods = ["GET", "POST"])
 def register_sponsor():
-    sponsor_form = RegisterSponsor()
     if request.method == "GET":
+        sponsor_form = RegisterSponsor()
         return render_template("form.html",title="Sponsor Registration", form = sponsor_form, login=False)
     elif request.method == "POST":
         if sponsor_form.validate_on_submit():
             if sponsor_form.password.data == sponsor_form.repeat_password.data:
-                sponsor = Sponsors()
+                sponsor = sponsors()
                 sponsor_form.populate_obj(sponsor)
                 db.session.add(sponsor)
                 db.session.commit()            
-                return "Success"
-            return "Passwords dont match"
-        return "Validation Failed"
+                session["username"] = sponsor.username
+                session["type"] = "Sponsor"
+                return redirect(url_for("sponsor_dashboard"))
+            return render_template("error.html", error_code=404, error_message="Page Not Found")
+        return render_template("error.html", error_code=404, error_message="Page Not Found")
     else:
-        return "Error Page"
-        
+        return render_template("error.html", error_code=404, error_message="Page Not Found")
+
+@app.route("/sponsor/dashboard")
+def sponsor_dashboard():
+    if "type" in session.keys() and session["type"] == "Sponsor":
+        return render_template("sponsor_dashboard.html")
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/sponsor/find")
+def sponsor_find():
+    if "type" in session.keys() and session["type"] == "Sponsor":
+        pass
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/sponsor/stats")
+def sponsor_stats():
+    if "type" in session.keys() and session["type"] == "Sponsor":
+        pass
+    else:
+        return redirect(url_for("login"))

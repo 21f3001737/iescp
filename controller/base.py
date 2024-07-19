@@ -16,7 +16,6 @@ from wtforms import (
     SubmitField, 
     RadioField, 
     IntegerField,
-    DecimalField    
 )
 class Login(FlaskForm):
     username = StringField('Username', validators=[validators.input_required()])
@@ -36,6 +35,11 @@ def isValidUser(form):
     else:
         pass
 
+@app.route("/")
+def home():
+    return render_template("base.html")
+
+
 @app.route("/login", methods = ["GET", "POST"])
 def login():
     login = Login()
@@ -47,12 +51,12 @@ def login():
                 session["type"] = login.type.data    
                 session["username"] = login.username.data
             else:
-                return "No User found"
+                return render_template("error.html", error_code=404, error_message="User Not Found")
         else:
-            return "Validation Failed"
+            return render_template("form.html", title="Login", form=login, login = True)
         return render_template("base.html")
     else:
-        pass
+        return render_template("error.html", error_code=404, error_message="Page Not Found")
 
 @app.route("/logout")
 def logout():

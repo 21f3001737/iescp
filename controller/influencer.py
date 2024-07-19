@@ -29,7 +29,7 @@ class RegisterInfluencer(FlaskForm):
     submit = SubmitField('Submit')
 
 
-@app.route("/register/influencer", methods = ["GET", "POST"])
+@app.route("/influencer/register", methods = ["GET", "POST"])
 def register_influencer():
     if request.method == "GET":
         influencer_form = RegisterInfluencer()
@@ -41,8 +41,31 @@ def register_influencer():
                 influencer_form.populate_obj(influencer)
                 db.session.add(influencer)
                 db.session.commit()            
-                return "Success"
-            return "Passwords dont match"
-        return "Validation Failed"
+                session["username"] = influencer.username
+                session["type"] = "Influencer"
+                return redirect(url_for("influencer_dashboard"))
+            return render_template("error.html", error_code=404, error_message="Page Not Found")
+        return render_template("error.html", error_code=404, error_message="Page Not Found")
     else:
-        return "Error Page"
+        return render_template("error.html", error_code=404, error_message="Page Not Found")
+
+@app.route("/influencer/dashboard")
+def influencer_dashboard():
+    if "type" in session.keys() and session["type"] == "Influencer":
+        return render_template("influencer_dashboard.html")
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/influencer/find")
+def influencer_find():
+    if "type" in session.keys() and session["type"] == "Influencer":
+        pass
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/influencer/stats")
+def influencer_stats():
+    if "type" in session.keys() and session["type"] == "Influencer":
+        pass
+    else:
+        return redirect(url_for("login"))

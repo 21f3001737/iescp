@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+
+{% endblock %}
+
+{% block content %}
+<div class = "vstack gap-4">
+  <div class="display-4"> Welcome {{session['username']}}!</div>
+  <div class="container-md">
+    <div class="display-6"> Ongoing Campaigns:</div>
+<div class="container-md">
+    {% for i in range(4) %}
+      <div class="border hstack gap-3">
+        <div class="h5">Campaign {{i}}</div>
+        <div class="h6">Progress 10%</div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+  <div class="container-md">
+    <div class="display-6"> Flagged Users/Campaigns:</div>
+    <div class="container-md">
+    {% for i in range(4) %}
+      <div class="border hstack gap-3">
+        <div class="h5">Campaign {{i}}</div>
+        <div class="h6">Progress 10%</div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock%}
