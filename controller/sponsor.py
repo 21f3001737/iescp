@@ -54,6 +54,7 @@ def register_sponsor():
                 db.session.commit()            
                 session["username"] = sponsor.username
                 session["type"] = "Sponsor"
+                session["id"] = sponsor.id
                 return redirect(url_for("sponsor_dashboard"))
             return render_template("error.html", error_code=404, error_message="Page Not Found")
         return render_template("error.html", error_code=404, error_message="Page Not Found")

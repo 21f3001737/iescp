@@ -29,5 +29,6 @@ with app.app_context():
     from controller.sponsor import *
     from controller.influencer import *
     from controller.admin import *
+    from controller.campaign import *
     if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8099)

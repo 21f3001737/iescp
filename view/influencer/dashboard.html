@@ -10,22 +10,29 @@
   <div class="container-md">
     <div class="display-6"> Ongoing Campaigns:</div>
 <div class="container-md">
-    {% for i in range(4) %}
-      <div class="border hstack gap-3">
-        <div class="h5">Campaign {{i}}</div>
-        <div class="h6">Progress 10%</div>
-      </div>
+    {% for request in campaigns %}
+<div class="card" style="width: 20rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{request.campaign.name}}</h5>
+    <h6 class="card-subtitle mb-2 text-body-secondary">{{request.payment_amount}}</h6>
+  </div>
+</div>
     {% endfor %}
     </div>
   </div>
   <div class="container-md">
     <div class="display-6"> New Requests:</div>
     <div class="container-md">
-    {% for i in range(4) %}
-      <div class="border hstack gap-3">
-        <div class="h5">Campaign {{i}}</div>
-        <div class="h6">Progress 10%</div>
-      </div>
+    {% for request in requests %}
+<div class="card" style="width: 20rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{request.campaign.name}}</h5>
+    <h6 class="card-subtitle mb-2 text-body-secondary">{{request.payment_amount}}</h6>
+<a href="{{url_for("accept_request", ad_request_id=request.id)}}" class="btn btn-success"><i class="bi bi-check"></i></a>
+<a href="{{url_for("negotiate_request", ad_request_id=request.id, amount=amount)}}" class="btn btn-warning"><i class="bi bi-cash"></i></a>
+<a href="{{url_for("reject_request", ad_request_id=request.id)}}" class="btn btn-danger"><i class="bi bi-x"></i></a>
+  </div>
+</div>
     {% endfor %}
     </div>
   </div>

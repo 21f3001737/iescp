@@ -1,0 +1,58 @@
+{% if 'type' in session.keys() %}
+  {% if session['type'] == 'Sponsor' %}
+    {% extends 'sponsor/base.html'%}
+  {% elif session['type'] == 'Influencer' %}
+    {% extends 'influencer/base.html'%}
+  {% else %}
+    {% extends 'base.html'%}
+  {% endif %}
+{% else %}
+  {% extends 'base.html'%}
+{% endif %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+<div class="vstack gaps=5">
+<div class="display-2">{{campaign.name}}</div>
+<div class="lead">Description: {{campaign.description}}</div>
+<div class="lead">Budget: {{campaign.budget}}</div>
+<div class="display-4">Ad requests: </div>
+<div class="hstack">
+{% for ad_request in ad_requests%}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{ad_request.id}}</h5>
+    <h6 class="card-subtitle mb-2 text-body-secondary">Influencer: {{ad_request.influencer.name}}</h6>
+    <h6 class="card-subtitle mb-2 text-body-secondary">{{ad_request.payment_amount}}</h6>
+    {% if ad_request.status == 0 %}
+    <span class="badge text-bg-danger">Pending</span>
+    {% elif ad_request.status == 1 %}
+    <span class="badge text-bg-warning">Negotiation</span>
+    {% elif ad_request.status == 2%}
+    <span class="badge text-bg-success">Accepted</span>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+
+{% if 'type' in session.keys() and session['type'] == 'Sponsor' %}
+<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newAdRequestModal">New</button>
+{% endif %}
+</div>
+
+<div class="modal fade" id="newAdRequestModal" tabindex="-1" aria-labelledby="newAdRequestLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="newAdRequestModalLabel">New Ad Request</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ render_form(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -71,6 +71,8 @@ def logout():
         session.pop("type")
     if "username" in session.keys():
         session.pop("username")
+    if "id" in session.keys():
+        session.pop("id")
     return redirect(url_for("login"))
 
 @app.route("/dashboard")

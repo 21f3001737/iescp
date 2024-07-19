@@ -7,7 +7,7 @@ from flask import (
         flash,
     )
 from flask import render_template
-from model.db import db, Influencers
+from model.db import db, Influencers, Campaigns, AdRequests
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, 
@@ -52,15 +52,17 @@ def register_influencer():
 @app.route("/influencer/dashboard")
 def influencer_dashboard():
     if "type" in session.keys() and session["type"] == "Influencer":
-        return render_template("influencer/dashboard.html")
+        ad_requests_all = AdRequests.query.filter(AdRequests.influencer_id == session["id"])
+        active_requests = ad_requests_all.filter(AdRequests.status == 2).all()
+        new_requests = ad_requests_all.filter(AdRequests.status == 0).all()
+        return render_template("influencer/dashboard.html", campaigns = active_requests, requests = new_requests)
     else:
         return redirect(url_for("login"))
 
 @app.route("/influencer/find")
 def influencer_find():
     if "type" in session.keys() and session["type"] == "Influencer":
-        return render_template("influencer/stats.html")
-        pass
+        return render_template("influencer/find.html")
     else:
         return redirect(url_for("login"))
 
@@ -68,6 +70,36 @@ def influencer_find():
 def influencer_stats():
     if "type" in session.keys() and session["type"] == "Influencer":
         return render_template("influencer/stats.html")
-        pass
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/influencer/accept/<ad_request_id>")
+def accept_request(ad_request_id):
+    if "type" in session.keys() and session["type"] == "Influencer":
+        ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
+        ad_request.status = 2
+        db.session.commit()
+        return redirect(url_for("influencer_dashboard"))
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/influencer/negotiate/<ad_request_id>/<amount>")
+def negotiate_request(ad_request_id, amount):
+    if "type" in session.keys() and session["type"] == "Influencer":
+        ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
+        ad_request.status = 1
+        ad_request.payment_amount = amount 
+        db.session.commit()
+        return redirect(url_for("influencer_dashboard"))
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/influencer/accept/<ad_request_id>")
+def reject_request(ad_request_id):
+    if "type" in session.keys() and session["type"] == "Influencer":
+        ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
+        ad_request.status = 2
+        db.session.commit()
+        return redirect(url_for("influencer_dashboard"))
     else:
         return redirect(url_for("login"))
