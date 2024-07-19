@@ -1,0 +1,55 @@
+{% extends 'influencer/base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+{% block content %}
+
+<div class="vstack gap-4">
+  {{ render_form(form) }}
+  <div class="container text-center">
+   <div class="row row-cols-auto">
+    {% for campaign in campaigns %}
+    <div class="card col m-5">
+      <div class="card-body">
+        <h5 class="card-title">{{campaign.name}}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{campaign.description}}</h6>
+<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#newAdRequestModal" data-bs-campaign-id={{campaign.id}}>New</button>
+        <a href="{{url_for("campaign_page", campaign_id=campaign.id)}}" class="btn btn-warning">View</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="newAdRequestModal" tabindex="-1" aria-labelledby="newAdRequestLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="newAdRequestModalLabel">New Ad Request</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ render_form(ad_request_form) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+const modal = document.getElementById('newAdRequestModal')
+if (modal) {
+  modal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    const recipient = button.getAttribute('data-bs-campaign-id')
+    const modalBodyInput = modal.querySelector('#campaign_id')
+    modalBodyInput.value = recipient
+  })
+}
+</script>
+{% endblock %}
+

@@ -28,6 +28,17 @@ class RegisterInfluencer(FlaskForm):
     budget = DecimalField('Budget', validators = [validators.input_required()])
     submit = SubmitField('Submit')
 
+class SearchForm(FlaskForm):
+    query_string = StringField('',validators=[validators.input_required()])
+    search  = SubmitField()
+
+
+class NewAdRequestForm(FlaskForm):
+    campaign_id = IntegerField('Campaign ID',  render_kw={'disabled':''})
+    messages = StringField('Message')
+    requirements = StringField('Requirements')
+    payment_amount = DecimalField('Payment Amount', validators = [validators.input_required()])
+    submit = SubmitField('Done!')
 
 @app.route("/influencer/register", methods = ["GET", "POST"])
 def register_influencer():
@@ -59,10 +70,25 @@ def influencer_dashboard():
     else:
         return redirect(url_for("login"))
 
-@app.route("/influencer/find")
+@app.route("/influencer/find", methods=["GET", "POST"])
 def influencer_find():
     if "type" in session.keys() and session["type"] == "Influencer":
-        return render_template("influencer/find.html")
+        search = SearchForm()
+        ad_request_form = NewAdRequestForm()
+        campaigns = Campaigns.query.filter().all()
+        if request.method == "GET":
+            return render_template("influencer/find.html", form = search, ad_request_form = ad_request_form, campaigns = campaigns)
+        elif request.method == "POST":
+            if search.search.data:
+                campaigns = Campaigns.query.filter(Campaigns.name.contains(search.query_string.data))
+            elif ad_request_form.submit.data:
+                ad_request = AdRequests()
+                ad_request_form.populate_obj(ad_request)
+                ad_request.influencer_id == session["id"]
+                ad_request.status = 1
+                db.session.add(ad_request)
+                db.session.commit()
+            return render_template("influencer/find.html", form = search,ad_request_form = ad_request_form, campaigns = campaigns)
     else:
         return redirect(url_for("login"))
 
@@ -77,7 +103,7 @@ def influencer_stats():
 def accept_request(ad_request_id):
     if "type" in session.keys() and session["type"] == "Influencer":
         ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
-        ad_request.status = 2
+        ad_request.status = 3
         db.session.commit()
         return redirect(url_for("influencer_dashboard"))
     else:
@@ -87,7 +113,7 @@ def accept_request(ad_request_id):
 def negotiate_request(ad_request_id, amount):
     if "type" in session.keys() and session["type"] == "Influencer":
         ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
-        ad_request.status = 1
+        ad_request.status = 2
         ad_request.payment_amount = amount 
         db.session.commit()
         return redirect(url_for("influencer_dashboard"))
@@ -98,7 +124,7 @@ def negotiate_request(ad_request_id, amount):
 def reject_request(ad_request_id):
     if "type" in session.keys() and session["type"] == "Influencer":
         ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
-        ad_request.status = 2
+        ad_request.status = 4
         db.session.commit()
         return redirect(url_for("influencer_dashboard"))
     else:
