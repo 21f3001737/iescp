@@ -7,7 +7,7 @@ from flask import (
         flash,
     )
 from flask import render_template
-from model.db import db, Sponsors
+from model.db import db, Sponsors, Influencers
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, 
@@ -27,11 +27,15 @@ def isValidUser(form):
     if form.type.data == "Sponsor":
         sponsor = Sponsors.query.filter(Sponsors.username == form.username.data).first()
         if sponsor:
-            return True
+            return sponsor
         else:
-            return False
+            return None
     elif form.type.data == "Influencer":
-        pass
+        influencer = Influencers.query.filter(Influencers.username == form.username.data).first()
+        if influencer:
+            return influencer
+        else:
+            return None
     else:
         pass
 
@@ -47,9 +51,12 @@ def login():
         return render_template("form.html",title="Login", form= login, login=True)
     elif request.method == "POST":
         if login.validate_on_submit():
-            if isValidUser(login):
+            user = isValidUser(login)
+            if user:
                 session["type"] = login.type.data    
-                session["username"] = login.username.data
+                session["username"] = user.username
+                session["id"] = user.id
+                return redirect(url_for("dashboard"))
             else:
                 return render_template("error.html", error_code=404, error_message="User Not Found")
         else:
@@ -65,3 +72,13 @@ def logout():
     if "username" in session.keys():
         session.pop("username")
     return redirect(url_for("login"))
+
+@app.route("/dashboard")
+def dashboard():
+    if "type" in session.keys():
+        if session["type"] == "Influencer":
+            return redirect(url_for("influencer_dashboard"))
+        elif session["type"] == "Sponsor":
+            return redirect(url_for("sponsor_dashboard"))
+        else:
+            return redirect(url_for("login"))

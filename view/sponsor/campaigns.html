@@ -1,0 +1,36 @@
+{% extends 'sponsor/base.html' %}
+{% block content %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+<div class = "vstack gap-5">
+<div class = "hstack gap-4">
+{% for campaign in campaigns %}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{campaign.name}}</h5>
+    <h6 class="card-subtitle mb-2 text-body-secondary">{{campaign.budget}}</h6>
+    <p class="card-text">{{campaign.description}}</p>
+    <a href="#" class="card-link">Card link</a>
+  </div>
+</div>
+{% endfor %}
+</div>
+<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">New</button>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">New Campaign</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ render_form(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

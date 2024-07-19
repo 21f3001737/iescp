@@ -26,6 +26,7 @@ class Influencers(db.Model):
 class Campaigns(db.Model):
     __tablename__ = "campaigns"
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    sponsor_id = db.Column(db.Integer, db.ForeignKey("sponsors.id"))
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     start_date = db.Column(db.Date, nullable=False)

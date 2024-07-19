@@ -31,13 +31,13 @@ class RegisterInfluencer(FlaskForm):
 
 @app.route("/influencer/register", methods = ["GET", "POST"])
 def register_influencer():
+    influencer_form = RegisterInfluencer()
     if request.method == "GET":
-        influencer_form = RegisterInfluencer()
         return render_template("form.html",title="Influencer Registration", form = influencer_form, login=False)
     elif request.method == "POST":
         if influencer_form.validate_on_submit():
             if influencer_form.password.data == influencer_form.repeat_password.data:
-                influencer = influencers()
+                influencer = Influencers()
                 influencer_form.populate_obj(influencer)
                 db.session.add(influencer)
                 db.session.commit()            
@@ -52,13 +52,14 @@ def register_influencer():
 @app.route("/influencer/dashboard")
 def influencer_dashboard():
     if "type" in session.keys() and session["type"] == "Influencer":
-        return render_template("influencer_dashboard.html")
+        return render_template("influencer/dashboard.html")
     else:
         return redirect(url_for("login"))
 
 @app.route("/influencer/find")
 def influencer_find():
     if "type" in session.keys() and session["type"] == "Influencer":
+        return render_template("influencer/stats.html")
         pass
     else:
         return redirect(url_for("login"))
@@ -66,6 +67,7 @@ def influencer_find():
 @app.route("/influencer/stats")
 def influencer_stats():
     if "type" in session.keys() and session["type"] == "Influencer":
+        return render_template("influencer/stats.html")
         pass
     else:
         return redirect(url_for("login"))

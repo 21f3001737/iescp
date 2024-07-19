@@ -26,12 +26,8 @@
       {% endblock %}
       </ul>
     {%if 'username' in session.keys()%}
-    <li class="nav-item">
-      <a class="nav-link" href="#">{{session['username']}}</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
-    </li>
+    {{ render_nav_item('dashboard', session['username']) }}
+    {{ render_nav_item('logout', 'Logout')}}
     {%else%}
     {{render_nav_item('login', 'Login')}}
     {%endif%}
