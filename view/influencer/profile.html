@@ -1,0 +1,48 @@
+{% if 'type' in session.keys() %}
+{% if session['type'] == 'Sponsor' %}
+{% extends 'sponsor/base.html'%}
+{% elif session['type'] == 'Influencer' %}
+{% extends 'influencer/base.html'%}
+{% else %}
+{% extends 'base.html'%}
+{% endif %}
+{% else %}
+{% extends 'base.html'%}
+{% endif %}
+{% block content %}
+
+{% macro render_form_element(element, disabled) %}
+<div class="hstack gap-2">
+  <label class="form-label" style="width: 5%">
+    {{element.label}}:
+  </label>
+  {{element(class="form-control border-bottom border-primary me-4", style="width: 90%", disabled=disabled)}}
+</div>
+{% endmacro %}
+
+<form class="vstack gap-4" name="profile_form" method="post"
+  action="{{url_for('influencer_profile', influencer_id=influencer.id)}}" enctype="multipart/form-data">
+  {{update_form.hidden_tag()}}
+  <img class="rounded" style="max-width: 400px;"
+    src="https://cdn.dribbble.com/users/5534/screenshots/14230133/profile_4x.jpg" />
+  {{ render_form_element(update_form.name, disabled) }}
+  {{ render_form_element(update_form.username, disabled) }}
+  {{ render_form_element(update_form.category, disabled) }}
+  <div class="hstack gap-2">
+    <label class="form-label" style="width: 5%">
+      {{update_form.niche.label}}:
+    </label>
+    {{update_form.niche(list="niche_list", class="form-control border-bottom border-primary me-4", style="width: 90%",
+    disabled=disabled)}}
+  </div>
+  <datalist id="niche_list">
+    {% for niche in niches%}
+    <option value="{{niche}}">
+      {% endfor %}
+  </datalist>
+  {{ render_form_element(update_form.budget, disabled) }}
+  {% if not disabled%}
+  {{update_form.update(class_="btn btn-primary", value="Update", width="10%")}}
+  {% endif %}
+</form>
+{% endblock %}

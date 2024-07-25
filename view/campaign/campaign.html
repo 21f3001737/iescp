@@ -1,44 +1,69 @@
 {% if 'type' in session.keys() %}
-  {% if session['type'] == 'Sponsor' %}
-    {% extends 'sponsor/base.html'%}
-  {% elif session['type'] == 'Influencer' %}
-    {% extends 'influencer/base.html'%}
-  {% else %}
-    {% extends 'base.html'%}
-  {% endif %}
+{% if session['type'] == 'Sponsor' %}
+{% extends 'sponsor/base.html'%}
+{% elif session['type'] == 'Influencer' %}
+{% extends 'influencer/base.html'%}
 {% else %}
-  {% extends 'base.html'%}
+{% extends 'base.html'%}
+{% endif %}
+{% else %}
+{% extends 'base.html'%}
 {% endif %}
 {% from 'bootstrap5/form.html' import render_form %}
 
 {% block content %}
-<div class="vstack gaps=5">
-<div class="display-2">{{campaign.name}}</div>
-<div class="lead">Description: {{campaign.description}}</div>
-<div class="lead">Budget: {{campaign.budget}}</div>
-<div class="display-4">Ad requests: </div>
-<div class="hstack">
-{% for ad_request in ad_requests%}
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">{{ad_request.id}}</h5>
-    <h6 class="card-subtitle mb-2 text-body-secondary">Influencer: {{ad_request.influencer.name}}</h6>
-    <h6 class="card-subtitle mb-2 text-body-secondary">{{ad_request.payment_amount}}</h6>
-    {% if ad_request.status == 0 %}
-    <span class="badge text-bg-danger">Pending</span>
-    {% elif ad_request.status == 1 %}
-    <span class="badge text-bg-warning">Negotiation</span>
-    {% elif ad_request.status == 2%}
-    <span class="badge text-bg-success">Accepted</span>
-    {% endif %}
+<div class="vstack gaps-5 px-5 mx-5 my-2">
+  <div class="display-1 mt-4">{{campaign.name}}</div>
+  <div class="lead mb-3">{{campaign.start_date}} to {{campaign.end_date}}</div>
+  <div class="lead mb-2">Description: {{campaign.description}}</div>
+  <div class="lead mb-2">Goals: {{campaign.goals}}</div>
+  <div class="lead mb-5">Budget: {{campaign.budget}}</div>
+  <div class="display-5 mb-3">Ad requests: </div>
+  <div class="row">
+    {% for ad_request in ad_requests%}
+    <div class="card m-5" style="width: 20rem;">
+      <div class="card-body">
+        <h5 class="card-title my-1"><i class="bi bi-person-fill"></i> :{{ad_request.influencer.name}}</h5>
+        <h6 class="card-subtitle mb-3 text-body-secondary"><i class="bi bi-cash"></i> :{{ad_request.payment_amount}}
+        </h6>
+        <h6 class="card-subtitle mb-1 text-body-secondary">
+          {% if ad_request.status == 0 %}
+          <span class="badge text-bg-warning">Req Spons</span>
+          {% elif ad_request.status == 1 %}
+          <span class="badge text-bg-warning">Req Infl</span>
+          {% elif ad_request.status == 2%}
+          <span class="badge text-bg-success">Accepted</span>
+          {% elif ad_request.status == 3%}
+          <span class="badge text-bg-danger">Rejected</span>
+          {% endif %}
+        </h6>
+        {% if ad_request.status == 0 and 'type' in session.keys() and session['type'] == 'Influencer' and session['id']
+        == ad_request.influencer_id %}
+        <a href="{{url_for('influencer_accept_request', ad_request_id=ad_request.id)}}" class="btn btn-success"><i
+            class="bi bi-check"></i></a>
+        <a href="{{url_for('influencer_negotiate_request', ad_request_id=ad_request.id, amount = ad_request.amount)}}"
+          class="btn btn-warning"><i class="bi bi-cash"></i></a>
+        <a href="{{url_for('influencer_reject_request', ad_request_id=ad_request.id)}}" class="btn btn-danger"><i
+            class="bi bi-x"></i></a>
+        <span class="badge text-bg-warning">Req by Spons</span>
+        {% elif ad_request.status == 1 and 'type' in session.keys() and session['type'] == 'Sponsor' and session['id']
+        == ad_request.campaign.sponsor_id %}
+        <a href="{{url_for('sponsor_accept_request', ad_request_id=ad_request.id)}}" class="btn btn-success"><i
+            class="bi bi-check"></i></a>
+        <a href="{{url_for('sponsor_negotiate_request', ad_request_id=ad_request.id, amount = ad_request.amount)}}"
+          class="btn btn-warning"><i class="bi bi-cash"></i></a>
+        <a href="{{url_for('sponsor_reject_request', ad_request_id=ad_request.id)}}" class="btn btn-danger"><i
+            class="bi bi-x"></i></a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
   </div>
-</div>
-{% endfor %}
-</div>
 
-{% if 'type' in session.keys() and session['type'] == 'Sponsor' %}
-<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newAdRequestModal">New</button>
-{% endif %}
+  {% if 'type' in session.keys() and session['type'] == 'Sponsor' %}
+  <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+    data-bs-target="#newAdRequestModal">New</button>
+  {% endif %}
 </div>
 
 <div class="modal fade" id="newAdRequestModal" tabindex="-1" aria-labelledby="newAdRequestLabel" aria-hidden="true">

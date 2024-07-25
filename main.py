@@ -6,6 +6,7 @@ from model.db import db
 from flask_bootstrap import Bootstrap5
 import secrets
 from flask_wtf.csrf import CSRFProtect
+from model.dummy_data import add_dummy_data
 
 
 def setup_app():
@@ -16,6 +17,7 @@ def setup_app():
     with app.app_context():
         db.init_app(app)
         db.create_all()
+        add_dummy_data()
         api = Api(app)
         CORS(app, resources={r"/*": {"origins": "*"}})
         bootstrap = Bootstrap5(app)
@@ -25,10 +27,6 @@ def setup_app():
 app, api, bootstrap = setup_app()
 
 with app.app_context():
-    from controller.base import *
-    from controller.sponsor import *
-    from controller.influencer import *
-    from controller.admin import *
-    from controller.campaign import *
+    from controller import *
     if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8099)

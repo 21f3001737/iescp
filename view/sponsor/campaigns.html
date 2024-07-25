@@ -2,20 +2,28 @@
 {% block content %}
 {% from 'bootstrap5/form.html' import render_form %}
 
-<div class = "vstack gap-5">
-<div class = "hstack gap-4">
-{% for campaign in campaigns %}
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">{{campaign.name}}</h5>
-    <h6 class="card-subtitle mb-2 text-body-secondary">{{campaign.budget}}</h6>
-    <p class="card-text">{{campaign.description}}</p>
-    <a href="{{url_for('campaign_page', campaign_id = campaign.id)}}" class="card-link"> View Campaign </a>
+<div class="container gap-5 mx-auto">
+  <button type="button" class="m-5 btn btn-outline-primary" data-bs-toggle="modal"
+    data-bs-target="#newCampaignModal">New</button>
+  <div class="d-flex flex-row" style="flex-wrap:wrap;">
+    {% for campaign in campaigns %}
+    <div class="card m-4" style="width: 24rem;">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-file-earmark-richtext-fill"></i>:{{campaign.name}}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{campaign.description}}</p>
+          <a href="{{url_for('campaign_page', campaign_id = campaign.id)}}" class="btn btn-outline-success"> View</a>
+          <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
+            data-bs-target="#newCampaignModal" data-bs-campaign-id={{campaign.id}}
+            data-bs-campaign-name="{{campaign.name}}" data-bs-campaign-description="{{campaign.description}}"
+            data-bs-campaign-start-date="{{campaign.start_date}}" data-bs-campaign-end-date="{{campaign.end_date}}"
+            data-bs-campaign-budget={{campaign.budget}} data-bs-campaign-visibility={{campaign.visibility}}
+            data-bs-campaign-goals="{{campaign.goals}}" data-bs-campaign-niche="{{campaign.niche}}"> Edit</button>
+          <a href="{{url_for('sponsor_delete_campaign', campaign_id = campaign.id)}}" class="btn btn-outline-danger">
+            Delete</a>
+      </div>
+    </div>
+    {% endfor %}
   </div>
-</div>
-{% endfor %}
-</div>
-<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newCampaignModal">New</button>
 </div>
 
 
@@ -33,4 +41,29 @@
   </div>
 </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+
+  const modal = document.getElementById('newCampaignModal')
+  if (modal) {
+    modal.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget
+      const campaign_id = button.getAttribute('data-bs-campaign')
+      const campaign_name =
+      const campaign_description =
+      const campaign_start_date =
+      const campaign_end_date = 
+      const campaign_budget = 
+      const campaign_visibility = 
+      const campaign_niche = 
+      const
+        console.log(campaign)
+      // const modalBodyInput = modal.querySelector('#influencer_id')
+      // modalBodyInput.value = recipient
+    })
+  }
+</script>
 {% endblock %}

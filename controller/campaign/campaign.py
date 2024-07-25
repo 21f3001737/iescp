@@ -57,8 +57,7 @@ def campaign_page(campaign_id):
     else:
         return render_template("error.html", error_code=404, error_message="Campaign Not Found")
         
-# status: 0 -> request by sponsor
-# status: 1 -> request by influencer
-# status: 2 -> negotiation
-# status: 3 -> accepted
-# status: 4 -> rejected
+# status: 0 -> negotiation by sponsor
+# status: 1 -> negotiation by influencer
+# status: 2 -> accepted
+# status: 3 -> rejected

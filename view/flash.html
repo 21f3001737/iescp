@@ -1,0 +1,12 @@
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger">
+<p class="fw-semibold">
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+{{message}}
+</p>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}

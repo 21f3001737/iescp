@@ -1,3 +1,84 @@
 {% extends 'sponsor/base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
 {% block content %}
+
+
+<form name="search_form" class="hstack gap-2 px-5 mt-5 mx-2" method="post" action="{{url_for('sponsor_find')}}"
+  enctype="multipart/form-data">
+  {{form.hidden_tag()}}
+  <div class="vstack gap-2 border-end border-primary" style="width: 15vw;">
+    <div class="display-6 mb-5">Filters: </div>
+    <div class="">
+      <p class="">
+        {{form.date.name}}
+      </p>
+      {{form.date(class="form-control me-4")}}
+    </div>
+    <div class="">
+      <p class="">
+        {{form.revenue.name}}
+      </p>
+      {{form.revenue(class="form-control me-4")}}
+    </div>
+  </div>
+  <div class="vstack gap-4 px-5 mx-5 my-2" style="width: 70vw;">
+    <div class="hstack">
+      {{form.query_string(class="form-control border-bottom border-primary", width="90%")}}
+      {{form.search(class_="btn btn-primary", value="Search", width="10%")}}
+    </div>
+    <div class="container text-center">
+      <div class="row row-cols-auto">
+        {% for search_item in search_items %}
+        <div class="card col m-5" style="width: 18rem;">
+          <div class="card-body">
+            {% if search_item.__class__.__name__ == "Influencers"%}
+            <i class="bi bi-person-fill"></i>
+            <h5 class="card-title my-2">{{search_item.name}}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{search_item.category}}</h6>
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
+              data-bs-target="#newAdRequestModal" data-bs-influencer-id={{search_item.id}}>New</button>
+            {% else %}
+            <i class="bi bi-calendar-x-fill"></i>
+            <h5 class="card-title my-2">{{search_item.name}}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{search_item.description}}</h6>
+            <a href="{{url_for('campaign_page', campaign_id=search_item.id)}}" class="btn btn-warning">View</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+</form>
+
+
+
+<div class="modal fade" id="newAdRequestModal" tabindex="-1" aria-labelledby="newAdRequestLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="newAdRequestModalLabel">New Ad Request</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ render_form(ad_request_form) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+  const modal = document.getElementById('newAdRequestModal')
+  if (modal) {
+    modal.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget
+      const recipient = button.getAttribute('data-bs-influencer-id')
+      const modalBodyInput = modal.querySelector('#influencer_id')
+      modalBodyInput.value = recipient
+    })
+  }
+</script>
 {% endblock %}

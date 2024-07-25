@@ -1,28 +1,52 @@
 {% extends 'sponsor/base.html' %}
 
 {% block content %}
-<div class = "vstack gap-4">
-  <div class="display-4"> Welcome {{session['username']}}!</div>
-  <div class="container-md">
-    <div class="display-6"> Ongoing Campaigns:</div>
-<div class="container-md">
-    {% for i in range(4) %}
-      <div class="border hstack gap-3">
-        <div class="h5">Campaign {{i}}</div>
-        <div class="h6">Progress 10%</div>
+<div class = "vstack gap-4 m-5">
+  <div class="display-4 mx-auto"> Welcome {{session['user']['name']}}!</div>
+  <div>
+    <div class="display-6 my-2"> Ongoing Campaigns:</div>
+    <div style="overflow-x:scroll; width:90vw;">
+    <div class = "d-flex flex-row" style="width:fit-content;">
+    {% for campaign in campaigns %}
+      <div class="card m-4" style="width: 24rem;">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-file-earmark-richtext-fill"></i>: {{campaign.name}}</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">{{campaign.description}}</p>
+          <a href="{{url_for('campaign_page', campaign_id = campaign.id)}}" class="btn btn-outline-success"> View Campaign </a>
+        </div>
       </div>
     {% endfor %}
     </div>
   </div>
-  <div class="container-md">
-    <div class="display-6"> New Requests:</div>
-    <div class="container-md">
-    {% for i in range(4) %}
-      <div class="border hstack gap-3">
-        <div class="h5">Campaign {{i}}</div>
-        <div class="h6">Progress 10%</div>
+  <div>
+    <div class="display-6 mt-4 mb-2"> Ad Requests:</div>
+    <div style="overflow-x:scroll; width: 90vw;">
+    <div class="d-flex flex-row" style="width:fit-content">
+    {% for ad_request in ad_requests %}
+    {% if ad_request.status != 3 %}
+    <div class="card m-4" style="width: 20rem;">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-file-earmark-richtext-fill"></i>: {{ad_request.campaign.name}}</h5>
+        <h5 class="card-title"><i class="bi bi-person-fill"></i>: {{ad_request.influencer.name}}</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary"><i class="bi bi-cash"></i>: {{ad_request.payment_amount}}</h6>
+        <h6 class="card-subtitle mb-2 text-body-secondary">{{ad_request.messages}}</h6>
+        {% if ad_request.status == 0 %}
+        <h6 class="card-subtitle mb-2 text-body-secondary">Status: Sent For Negotiation</h6>
+        <a href="{{url_for("sponsor_reject_request", ad_request_id=ad_request.id)}}" class="btn btn-danger"><i class="bi bi-x"></i></a>
+        {% elif ad_request.status == 1 %}
+        <h6 class="card-subtitle mb-2 text-body-secondary">Status: Recieved For Negotiation</h6>
+        <a href="{{url_for("sponsor_accept_request", ad_request_id=ad_request.id)}}" class="btn btn-success"><i class="bi bi-check"></i></a>
+        <a href="{{url_for("sponsor_negotiate_request", ad_request_id=ad_request.id, amount=amount)}}" class="btn btn-warning"><i class="bi bi-cash-coin"></i></a>
+        <a href="{{url_for("sponsor_reject_request", ad_request_id=ad_request.id)}}" class="btn btn-danger"><i class="bi bi-x"></i></a>
+        {% elif ad_request.status == 2 %}
+        <h6 class="card-subtitle mb-2 text-body-secondary">Status: Ongoing</h6>
+        <a href="{{url_for("sponsor_reject_request", ad_request_id=ad_request.id)}}" class="btn btn-danger"><i class="bi bi-x"></i></a>
+        {% endif %}
       </div>
+    </div>
+    {% endif %}
     {% endfor %}
+    </div>
     </div>
   </div>
 </div>

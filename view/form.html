@@ -7,7 +7,7 @@
 <legend>{{title}}</legend>
 {{ render_form(form) }}
 {% if login == true %}
-<div class="my-2 pt-2"> New User? Register as <a href="{{url_for('register_influencer')}}">Influencer</a>/<a href="{{url_for('register_sponsor')}}">Sponsor</a> </div>
+<div class="my-2 pt-2"> New User? Register as <a href="{{url_for('influencer_register')}}">Influencer</a>/<a href="{{url_for('sponsor_register')}}">Sponsor</a> </div>
 {% endif %}
 </div>
 

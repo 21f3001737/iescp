@@ -5,9 +5,10 @@ from flask import (
         url_for,
         redirect,
         flash,
+        jsonify,
+        render_template
     )
-from flask import render_template
-from model.db import db, Sponsors, Influencers
+from model.db import db, Sponsors, Influencers, Admin
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, 
@@ -15,8 +16,8 @@ from wtforms import (
     PasswordField, 
     SubmitField, 
     RadioField, 
-    IntegerField,
 )
+
 class Login(FlaskForm):
     username = StringField('Username', validators=[validators.input_required()])
     password = PasswordField('Password')
@@ -25,24 +26,60 @@ class Login(FlaskForm):
     
 def isValidUser(form):
     if form.type.data == "Sponsor":
+        print("In Sponsor")
+        print(form.username.data)
         sponsor = Sponsors.query.filter(Sponsors.username == form.username.data).first()
+        print(sponsor)
+        print(sponsor.username)
         if sponsor:
-            return sponsor
+            print(sponsor.password)
+            if sponsor.password == form.password.data:
+                return sponsor, None
+            else:
+                return None, 1
         else:
-            return None
+            return None, 2
     elif form.type.data == "Influencer":
         influencer = Influencers.query.filter(Influencers.username == form.username.data).first()
         if influencer:
-            return influencer
+            if influencer.password == form.password.data:
+                return influencer, None
+            else:
+                return None, 1
         else:
-            return None
+            return None, 2
+    elif form.type.data == "Admin":
+        admin = Admin.query.filter(Admin.username == form.username.data).first()
+        if admin:
+            if admin.password == form.password.data:
+                return admin, None
+            else:
+                return None, 1
+        else:
+            return None, 2
     else:
+        return None, None
+        
+
+def assign_user(user):
+    duser = dict()
+    try:
+        duser["id"] = user.id
+        duser["name"] = user.name
+        duser["username"] = user.username
+        duser["budget"] = user.budget
+        duser["category"] = user.category
+        duser["industry"] = user.industry
+    except AttributeError:
         pass
+    return duser
 
 @app.route("/")
 def home():
-    return render_template("base.html")
-
+    if "type" not in session.keys():
+        return redirect(url_for('login'))
+    else:
+        return redirect(url_for('dashboard'))
 
 @app.route("/login", methods = ["GET", "POST"])
 def login():
@@ -51,28 +88,31 @@ def login():
         return render_template("form.html",title="Login", form= login, login=True)
     elif request.method == "POST":
         if login.validate_on_submit():
-            user = isValidUser(login)
+            user, error = isValidUser(login)
             if user:
                 session["type"] = login.type.data    
-                session["username"] = user.username
-                session["id"] = user.id
+                session["user"] = assign_user(user)
                 return redirect(url_for("dashboard"))
             else:
-                return render_template("error.html", error_code=404, error_message="User Not Found")
+                if error == 1:
+                    flash("Wrong Password!")
+                    return render_template("form.html", title="Login", form = login, login = True)
+                elif error == 2:
+                    flash("User not Found")
+                    return render_template("form.html", title="Login", form = login, login = True)
+                else:
+                    return render_template("error.html", error_code=500, error_message="Internal Server Error")
         else:
             return render_template("form.html", title="Login", form=login, login = True)
-        return render_template("base.html")
     else:
-        return render_template("error.html", error_code=404, error_message="Page Not Found")
+        return render_template("error.html", error_code=501, error_message=request.method + " method Not Implemented")
 
 @app.route("/logout")
 def logout():
     if "type" in session.keys():
         session.pop("type")
-    if "username" in session.keys():
-        session.pop("username")
-    if "id" in session.keys():
-        session.pop("id")
+    if "user" in session.keys():
+        session.pop("user")
     return redirect(url_for("login"))
 
 @app.route("/dashboard")
