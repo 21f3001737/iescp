@@ -26,13 +26,8 @@ class Login(FlaskForm):
     
 def isValidUser(form):
     if form.type.data == "Sponsor":
-        print("In Sponsor")
-        print(form.username.data)
         sponsor = Sponsors.query.filter(Sponsors.username == form.username.data).first()
-        print(sponsor)
-        print(sponsor.username)
         if sponsor:
-            print(sponsor.password)
             if sponsor.password == form.password.data:
                 return sponsor, None
             else:

@@ -26,11 +26,11 @@ from controller.base import assign_user
 
 class RegisterInfluencer(FlaskForm):
     name = StringField('Name', validators = [validators.input_required()])
-    username = StringField('Username', validators=[validators.input_required()])
-    password = PasswordField('Password', validators = [validators.input_required()])
-    repeat_password = PasswordField('Repeat Password', validators = [validators.input_required()])
+    username = StringField('Username', validators=[validators.input_required(), validators.Regexp(r'^[\w.@+-_]+$'), validators.Length(min=4,max=20)])
+    password = PasswordField('Password', validators = [validators.input_required(), validators.Length(min=6)])
+    repeat_password = PasswordField('Repeat Password', validators = [validators.input_required(), validators.EqualTo('password', message='Passwords do not match')])
     category = StringField('Category', validators = [validators.input_required()])
-    niche = SelectField('Neiche', validators=[validators.input_required()])
+    niche = StringField('Niche', validators=[validators.input_required()])
     budget = DecimalField('Budget', validators = [validators.input_required()])
     followers = IntegerField('Followers', validators=[validators.input_required()])
     submit = SubmitField('Submit')

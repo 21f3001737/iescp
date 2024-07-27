@@ -32,7 +32,6 @@ class NewCampaignForm(FlaskForm):
     goals = StringField('Goals', validators = [validators.input_required()])
     submit = SubmitField('Done!')
 
-
 @app.route("/sponsor/campaigns", methods = ["GET", "POST"])
 def sponsor_campaigns():
     if "type" in session.keys() and session["type"] == "Sponsor":
