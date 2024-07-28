@@ -1,0 +1,47 @@
+{% set total = 0 %}
+{% set new = 0 %}
+{% set ongoing = 0 %}
+
+{% from 'macros.html' import ad_request_row with context %}
+
+{% macro info_box(number, label) %}
+<div class="bg-light p-4 rounded mx-2" style="width:33%; box-shadow: -10px 10px 10px 1px #e2e2e2;">
+  <div class="font-weight-bold h1">
+    {{number}}
+  </div>
+  <div>
+    {{label}}
+  </div>
+</div>
+{% endmacro %}
+
+
+
+<div class="d-flex flex-column justify-content-evenly mx-4" style="width: 60vw">
+  <div class="banner bg-dark py-4 ps-3 rounded my-2"
+    style="background: linear-gradient(200deg, rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);">
+    <h1 class="ms-4 display-6 text-capitalize" style="color:white; font-weight: bolder;">Hi, {{session["user"]["name"]}}
+    </h1>
+  </div>
+  <div class="info d-flex flex-row my-2">
+    {{ info_box(total, "Total Ad Requests") }}
+    {{ info_box(ongoing, "Ongoing") }}
+    {{ info_box(new, "New Requests") }}
+  </div>
+  <table class="listing table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Sponsor</th>
+        <th scope="col">Budget</th>
+        <th scope="col">Status</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ad_request in ad_requests %}
+      {{ ad_request_row(ad_request) }}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

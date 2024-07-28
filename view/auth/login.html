@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+<div class="container border p-5 align-self-center mt-5 rounded"
+  style="width: 500px; background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+  <legend>{{title}}</legend>
+  <form name="login_form" method="post" action="{{url_for('login')}}" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="">
+      <p class="text-capitalize">
+        {{form.username.label}}
+      </p>
+      {{form.username(class="form-control me-4")}}
+    </div>
+    <div class="">
+      <p class="text-capitalize">
+        {{form.password.label}}
+      </p>
+      {{form.password(class="form-control me-4")}}
+    </div>
+    <div class="">
+      <p class="text-capitalize">
+        {{form.type.label}}
+      </p>
+      {{form.type(class="form-control d-flex flex-row justify-content-evenly", style="list-style: none;
+      background-color:white;")}}
+    </div>
+    <div class="">
+      {{form.submit(class="form-control me-4", style="background: rgb(255,158,10);background: linear-gradient(137deg,
+      rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);color: white; font-weight: bold;")}}
+    </div>
+    <form>
+      {% if login == true %}
+      <div class="my-2 pt-2"> New User? Register as <a href="{{url_for('influencer_register')}}">Influencer</a>/<a
+          href="{{url_for('sponsor_register')}}">Sponsor</a> </div>
+      {% endif %}
+</div>
+
+{% endblock %}

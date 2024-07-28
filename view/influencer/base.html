@@ -1,8 +1,17 @@
 {% extends 'base.html' %}
 
 {% block nav %}
-     {% from 'bootstrap5/nav.html' import render_nav_item %}
-     {{ render_nav_item('influencer_find', 'Find') }}
-     {{ render_nav_item('influencer_stats', 'Stats') }}
+{% from 'bootstrap5/nav.html' import render_nav_item %}
+<div class="d-flex flex-row">
+  <div class="h4 pt-2">
+    <i class="bi bi-search"></i>
+  </div>
+  {{ render_nav_item('influencer_find', 'Find') }}
+</div>
+<div class="d-flex flex-row">
+  <div class="h4 pt-2">
+    <i class="bi bi-graph-up"></i>
+  </div>
+  {{ render_nav_item('influencer_stats', 'Stats') }}
+</div>
 {% endblock %}
-

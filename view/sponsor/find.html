@@ -1,53 +1,81 @@
 {% extends 'sponsor/base.html' %}
 {% from 'bootstrap5/form.html' import render_form %}
+
+{% from 'macros.html' import campaign_card with context %}
+
+{% macro influencer_card(influencer) %}
+<div class="d-flex m-4 flex-column bg-light rounded align-items-center justify-content-center overflow-hidden"
+  style="width:22rem; height:29rem;">
+  <div class="d-flex flex-grow-1">
+    <img class="" style="object-fit: cover; width: 33%; height: 150px;"
+      src="https://i.pinimg.com/564x/6a/54/ca/6a54caeed5c72e2894c12202c2126db1.jpg" />
+    <img class="" style="object-fit: cover; width: 33%; height: 150px;"
+      src="https://i.pinimg.com/564x/35/47/67/3547677e6a089d79004136164a1f0228.jpg" />
+    <img class="" style="object-fit: cover; width: 34%; height: 150px;"
+      src="https://i.pinimg.com/736x/48/bc/57/48bc57adba406dcaa544e49c6fccac95.jpg" />
+  </div>
+  <div class="d-flex flex-column align-items-center justify-content-center" style="position: relative; top: -55px;">
+    <img class="" style="object-fit: cover; width: 100px; height: 100px;border: solid 1px black; border-radius: 50%;"
+      src="https://i.pinimg.com/736x/5c/10/48/5c1048361d7c3c5d52570c760cb6c4ce.jpg" />
+    <div class="text-center my-3 text-capitalize">{{influencer.name}}</div>
+    <div class="my-2 d-flex flex-column justify-content-center align-items-center">
+      <div class="card-subtitle text-body-secondary" style="font-weight: bold; font-size: 24px;">
+        {{influencer.followers}}</div>
+      <div class="card-subtitle text-body-secondary"> Followers </div>
+    </div>
+    <div class="mt-4">
+      <a href="{{url_for('influencer_profile', influencer_id=influencer.id)}}" class="btn m-2"
+        style="border: 2px solid transparent;border-image: linear-gradient(137deg, rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);border-image-slice: 1;">View</a>
+      <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#newAdRequestModal"
+        data-bs-influencer-id={{influencer.id}}>Hire</button>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% block navbar %}
+
+{% endblock %}
+
+
 {% block content %}
 
-
-<form name="search_form" class="hstack gap-2 px-5 mt-5 mx-2" method="post" action="{{url_for('sponsor_find')}}"
-  enctype="multipart/form-data">
+<form name="search_form" class="d-flex flex-row justify-content-start align-items-start" method="post"
+  action="{{url_for('sponsor_find')}}" enctype="multipart/form-data">
   {{form.hidden_tag()}}
-  <div class="vstack gap-2 border-end border-primary" style="width: 15vw;">
+  <div class="d-flex flex-column p-4" style="width: 20vw; background: white; position: fixed; height: 100%;">
     <div class="display-6 mb-5">Filters: </div>
-    <div class="">
-      <p class="">
+    <div>
+      <p class="text-capitalize">
         {{form.date.name}}
       </p>
-      {{form.date(class="form-control me-4")}}
+      {{form.date(class="form-control me-4",style="z-index: 4")}}
     </div>
     <div class="">
-      <p class="">
+      <p class="text-capitalize">
         {{form.revenue.name}}
       </p>
       {{form.revenue(class="form-control me-4")}}
     </div>
   </div>
-  <div class="vstack gap-4 px-5 mx-5 my-2" style="width: 70vw;">
-    <div class="hstack">
-      {{form.query_string(class="form-control border-bottom border-primary", width="90%")}}
-      {{form.search(class_="btn btn-primary", value="Search", width="10%")}}
+  <div class="pt-5 d-flex flex-column justify-content-center align-items-center flex-grow-1 p-1"
+    style="width: 70vw; margin-left: 20vw">
+    <div class="d-flex flex-row mb-4" style="box-shadow: -10px 10px 10px 1px #e2e2e2; width: 80%">
+      {{form.query_string(class="form-control rounded", width="60%")}}
+      {{form.search(class_="btn", style="background: rgb(255,158,10);background: linear-gradient(137deg,
+      rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);color: white; font-weight: bold;",
+      value="Search")}}
     </div>
-    <div class="container text-center">
-      <div class="row row-cols-auto">
-        {% for search_item in search_items %}
-        <div class="card col m-5" style="width: 18rem;">
-          <div class="card-body">
-            {% if search_item.__class__.__name__ == "Influencers"%}
-            <i class="bi bi-person-fill"></i>
-            <h5 class="card-title my-2">{{search_item.name}}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">{{search_item.category}}</h6>
-            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
-              data-bs-target="#newAdRequestModal" data-bs-influencer-id={{search_item.id}}>New</button>
-            {% else %}
-            <i class="bi bi-calendar-x-fill"></i>
-            <h5 class="card-title my-2">{{search_item.name}}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">{{search_item.description}}</h6>
-            <a href="{{url_for('campaign_page', campaign_id=search_item.id)}}" class="btn btn-warning">View</a>
-            {% endif %}
-          </div>
-        </div>
-        {% endfor %}
-      </div>
+    <div class="d-flex flex-wrap justify-content-center p-1 mt-4">
+      {% for search_item in search_items %}
+      {% if search_item.__class__.__name__ == "Influencers"%}
+      {{influencer_card(search_item)}}
+      {% else %}
+      {{campaign_card(search_item)}}
+      {% endif %}
+      {% endfor %}
     </div>
+  </div>
 </form>
 
 

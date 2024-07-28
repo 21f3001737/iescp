@@ -1,55 +1,81 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
   {% block head %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    {% block styles %}
-      {{ bootstrap.load_css() }}
-    {% endblock %}
-    <title>IESCP</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  {% block styles %}
+  {{ bootstrap.load_css() }}
   {% endblock %}
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{{url_for('home')}}">IESCP</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarColor01">
+  <title>IESCP</title>
+  {% endblock %}
+</head>
+
+<body>
+  <nav class="navbar fixed-top navbar-expand-lg bg-light">
+    <div class="container-fluid">
+      <div class="display-6 mx-2 me-4"><i class="bi bi-link-45deg"></i></div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+        aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarColor01">
         {% from 'bootstrap5/nav.html' import render_nav_item %}
-          <ul class="navbar-nav me-auto">
-            {% block nav %}
-            {% endblock %}
-          </ul>
-          {%if 'type' in session.keys()%}
-            {{ render_nav_item('dashboard', session['user']['name']) }}
-            {{ render_nav_item('logout', 'Logout')}}
-          {%else%}
-            {{render_nav_item('login', 'Login')}}
-          {%endif%}
+        <ul class="navbar-nav me-auto">
+          {% block nav %}
+          {% endblock %}
+        </ul>
+        {%if 'type' in session.keys()%}
+        <div class="d-flex flex-row">
+          <div class="h1 me-1 pt-1">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <div class="">
+            <div class="font-weight-bold">
+              {{ render_nav_item('dashboard', session['user']['name']) }}
+            </div>
+            <div class="text-capitalize text-muted">
+              {{session['type']}}
+            </div>
+          </div>
         </div>
+        <div class="h1 me-3">
+          <a class="" href="{{url_for('logout')}}"> <i class="bi bi-box-arrow-right"></i> </a>
+        </div>
+        {%else%}
+        {{render_nav_item('login', 'Login')}}
+        {%endif%}
       </div>
-    </nav>
-    {% include 'flash.html' %}
-    <style>
+    </div>
+  </nav>
+  {% include 'flash.html' %}
+  <style>
     .vertical-center {
       min-height: 89%;
-      min-height: 89vh; 
+      min-height: 89vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    </style>
-    <div class = "container-fluid vertical-center" >
-        {% block content %}    
-        {% endblock %}
-    </div>
-    {{ bootstrap.load_js() }}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        {% block scripts %}
-        {% endblock %}
-    </body>
+
+    :root {
+      --bs-body-bg: #efefef
+    }
+
+    .page>* {
+      padding-top: 5vh;
+    }
+  </style>
+  <div class="page" style="margin-top:11vh;">
+    {% block content %}
+    {% endblock %}
+  </div>
+  {{ bootstrap.load_js() }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% block scripts %}
+  {% endblock %}
+</body>
+
 </html>

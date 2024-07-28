@@ -80,7 +80,7 @@ def home():
 def login():
     login = Login()
     if request.method == "GET":
-        return render_template("form.html",title="Login", form= login, login=True)
+        return render_template("auth/login.html",title="Login", form= login, login=True)
     elif request.method == "POST":
         if login.validate_on_submit():
             user, error = isValidUser(login)
@@ -91,14 +91,14 @@ def login():
             else:
                 if error == 1:
                     flash("Wrong Password!")
-                    return render_template("form.html", title="Login", form = login, login = True)
+                    return render_template("auth/login.html", title="Login", form = login, login = True)
                 elif error == 2:
                     flash("User not Found")
-                    return render_template("form.html", title="Login", form = login, login = True)
+                    return render_template("auth/login.html", title="Login", form = login, login = True)
                 else:
                     return render_template("error.html", error_code=500, error_message="Internal Server Error")
         else:
-            return render_template("form.html", title="Login", form=login, login = True)
+            return render_template("auth/login.html", title="Login", form=login, login = True)
     else:
         return render_template("error.html", error_code=501, error_message=request.method + " method Not Implemented")
 

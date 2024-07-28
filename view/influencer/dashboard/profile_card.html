@@ -1,0 +1,21 @@
+<div class="d-flex justify-content-center align-item-center align-self-center rounded px-3 mx-4 py-5"
+  style="width: 26vw;max-height: 30vh;background-color: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+  <img class="mx-3" style="object-fit: cover; width: 150px; height: 150px;border: solid 1px black; border-radius: 50%;"
+    src="https://i.pinimg.com/736x/5c/10/48/5c1048361d7c3c5d52570c760cb6c4ce.jpg" />
+  <table class="table-borderless rounded mx-3">
+    <tbody>
+      <tr>
+        <th scope="row" class="px-2">Name</th>
+        <td class="px-3">{{session["user"]["name"]}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-2">Username</th>
+        <td class="px-3">{{session["user"]["username"]}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-2">Category</th>
+        <td class="px-3">{{session["user"]["category"]}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

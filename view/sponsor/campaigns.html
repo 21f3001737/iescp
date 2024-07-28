@@ -11,13 +11,6 @@
       <div class="card-body">
         <h5 class="card-title"><i class="bi bi-file-earmark-richtext-fill"></i>:{{campaign.name}}</h5>
         <h6 class="card-subtitle mb-2 text-body-secondary">{{campaign.description}}</p>
-          <a href="{{url_for('campaign_page', campaign_id = campaign.id)}}" class="btn btn-outline-success"> View</a>
-          <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
-            data-bs-target="#newCampaignModal" data-bs-campaign-id={{campaign.id}}
-            data-bs-campaign-name="{{campaign.name}}" data-bs-campaign-description="{{campaign.description}}"
-            data-bs-campaign-start-date="{{campaign.start_date}}" data-bs-campaign-end-date="{{campaign.end_date}}"
-            data-bs-campaign-budget={{campaign.budget}} data-bs-campaign-visibility={{campaign.visibility}}
-            data-bs-campaign-goals="{{campaign.goals}}" data-bs-campaign-niche="{{campaign.niche}}"> Edit</button>
           <a href="{{url_for('sponsor_delete_campaign', campaign_id = campaign.id)}}" class="btn btn-outline-danger">
             Delete</a>
       </div>
@@ -27,43 +20,4 @@
 </div>
 
 
-<div class="modal fade" id="newCampaignModal" tabindex="-1" aria-labelledby="newCampaignModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="newCampaignModalLabel">New Campaign</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        {{ render_form(form) }}
-      </div>
-    </div>
-  </div>
-</div>
-
-{% endblock %}
-
-
-{% block scripts %}
-<script>
-
-  const modal = document.getElementById('newCampaignModal')
-  if (modal) {
-    modal.addEventListener('show.bs.modal', event => {
-      const button = event.relatedTarget
-      const campaign_id = button.getAttribute('data-bs-campaign')
-      const campaign_name =
-      const campaign_description =
-      const campaign_start_date =
-      const campaign_end_date = 
-      const campaign_budget = 
-      const campaign_visibility = 
-      const campaign_niche = 
-      const
-        console.log(campaign)
-      // const modalBodyInput = modal.querySelector('#influencer_id')
-      // modalBodyInput.value = recipient
-    })
-  }
-</script>
 {% endblock %}

@@ -84,7 +84,7 @@ def influencer_profile(influencer_id):
 def influencer_register():
     influencer_form = RegisterInfluencer()
     if request.method == "GET":
-        return render_template("form.html",title="Influencer Registration", form = influencer_form, login=False)
+        return render_template("auth/register.html",title="Influencer Registration", form = influencer_form, influencer=True)
     elif request.method == "POST":
         if influencer_form.validate_on_submit():
             if influencer_form.password.data == influencer_form.repeat_password.data:
@@ -103,11 +103,8 @@ def influencer_register():
 @app.route("/influencer/dashboard")
 def influencer_dashboard():
     if "type" in session.keys() and session["type"] == "Influencer":
-        ad_requests_all = AdRequests.query.filter(AdRequests.influencer_id == session["user"]["id"])
-        active_requests = ad_requests_all.filter(AdRequests.status == 2).all()
-        outgoing_requests = ad_requests_all.filter(AdRequests.status == 1).all()
-        incoming_requests = ad_requests_all.filter(AdRequests.status == 0).all()
-        return render_template("influencer/dashboard.html", campaigns = active_requests, incoming_requests = incoming_requests, outgoing_requests = outgoing_requests)
+        ad_requests_all = AdRequests.query.filter(AdRequests.influencer_id == session["user"]["id"]).all()
+        return render_template("influencer/dashboard.html", ad_requests = ad_requests_all)
     else:
         return redirect(url_for("login"))
 

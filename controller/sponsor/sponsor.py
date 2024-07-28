@@ -52,12 +52,25 @@ class SearchForm(FlaskForm):
     date = DateField('Date')
     revenue = DecimalField('Revenue')
     search = SubmitField()
+
+class NewCampaignForm(FlaskForm):
+    campaign_id = IntegerField('Campaign ID')
+    name = StringField('Name', validators = [validators.input_required()])
+    description = StringField('Description', validators = [validators.input_required()])
+    start_date = DateField('Start Date', validators = [validators.input_required()])
+    end_date = DateField('End Date', validators = [validators.input_required()])
+    budget = DecimalField('Budget', validators = [validators.input_required()])
+    visibility = BooleanField('Visible')
+    goals = StringField('Goals', validators = [validators.input_required()])
+    submit = SubmitField('Done!')
+
+    
     
 @app.route("/sponsor/register", methods = ["GET", "POST"])
 def sponsor_register():
     sponsor_form = RegisterSponsor()
     if request.method == "GET":
-        return render_template("form.html",title="Sponsor Registration", form = sponsor_form, login=False)
+        return render_template("auth/register.html",title="Sponsor Registration", form = sponsor_form, influencer=False)
     elif request.method == "POST":
         if sponsor_form.validate_on_submit():
             if sponsor_form.password.data == sponsor_form.repeat_password.data:
@@ -90,14 +103,36 @@ def sponsor_profile(sponsor_id):
     else:
         return render_template("error.html", error_code=404, error_message="Sponsor Not Found")   
 
-@app.route("/sponsor/dashboard")
+@app.route("/sponsor/dashboard", methods=["GET", "POST"])
 def sponsor_dashboard():
     if "type" in session.keys() and session["type"] == "Sponsor":
+        campaign_form = NewCampaignForm()
         campaigns = Campaigns.query.filter(Campaigns.sponsor_id == session["user"]["id"]).all()
         ad_requests = []
         for campaign in campaigns:
             ad_requests += campaign.ad_requests
-        return render_template("sponsor/dashboard.html", campaigns = campaigns, ad_requests = ad_requests)
+        if request.method == "GET":
+            return render_template("sponsor/dashboard.html", campaigns = campaigns, ad_requests = ad_requests, form=campaign_form)
+        elif request.method == "POST":
+            if campaign_form.validate_on_submit():
+                new = True 
+                campaign = None
+                if campaign_form.campaign_id.data:
+                    campaign = Campaigns.query.filter(Campaigns.id == campaign_form.campaign_id.data).first()
+                    if campaign:
+                        new = False
+                    else:
+                        campaign = Campaigns()
+                else:
+                    campaign = Campaigns()
+                campaign_form.populate_obj(campaign)
+                campaign.sponsor_id = session["user"]["id"]
+                if new :
+                    db.session.add(campaign)
+                db.session.commit()
+                return redirect(url_for("sponsor_dashboard"))
+            else:
+                return render_template("sponsor/dashboard.html",campaigns = campaigns, ad_requests = ad_requests, form = campaign_form)     
     else:
         return redirect(url_for("login"))
 
@@ -109,7 +144,7 @@ def sponsor_find():
         campaigns = Campaigns.query.filter(Campaigns.visibility == True)
         influencers = Influencers.query.filter()
         if request.method == "GET":
-            return render_template("sponsor/find.html", form = search,ad_request_form = ad_request_form, search_items = campaigns.all() + influencers.all() )
+            return render_template("sponsor/find.html", form = search,ad_request_form = ad_request_form, search_items = influencers.all() + campaigns.all() )
         elif request.method == "POST":
             if search.search.data:
                 campaigns = Campaigns.query.filter(or_(Campaigns.visibility == True, Campaigns.id == session["user"]["id"]))
@@ -129,7 +164,7 @@ def sponsor_find():
                 ad_request.status = 0
                 db.session.add(ad_request)
                 db.session.commit()
-            return render_template("sponsor/find.html", form = search, ad_request_form = ad_request_form, search_items = campaigns.all() + influencers.all() )
+            return render_template("sponsor/find.html", form = search, ad_request_form = ad_request_form, search_items = influencers.all() + campaigns.all() )
     else:
         return redirect(url_for("login"))
 

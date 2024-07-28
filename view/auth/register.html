@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+<div class="container border p-5 align-self-center mt-5 rounded"
+  style="width: 500px; background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+  <legend>{{title}}</legend>
+  {% if influencer %}
+  <form name="register_form" method="post" action="{{url_for('influencer_register')}}" enctype="multipart/form-data">
+    {% else %}
+    <form name="register_form" method="post" action="{{url_for('sponsor_register')}}" enctype="multipart/form-data">
+      {% endif %}
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        <label class="text-capitalize">
+          {{form.name.label}}
+        </label>
+        {{form.name(class="form-control me-4")}}
+      </div>
+      <div class="mb-3">
+        <label class="text-capitalize">
+          {{form.username.label}}
+        </label>
+        {{form.username(class="form-control me-4")}}
+      </div>
+      <div class="d-flex flex-row mb-3 justify-content-evenly">
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.password.label}}
+          </label>
+          {{form.password(class="form-control me-4")}}
+        </div>
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.repeat_password.label}}
+          </label>
+          {{form.repeat_password(class="form-control me-4")}}
+        </div>
+      </div>
+      {% if influencer %}
+      <div class="d-flex flex-row mb-3 justify-content-evenly">
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.category.label}}
+          </label>
+          {{form.category(class="form-control me-4")}}
+        </div>
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.niche.label}}
+          </label>
+          {{form.niche(class="form-control me-4")}}
+        </div>
+      </div>
+      <div class="d-flex flex-row mb-3 justify-content-evenly">
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.budget.label}}
+          </label>
+          {{form.budget(class="form-control me-4")}}
+        </div>
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.followers.label}}
+          </label>
+          {{form.followers(class="form-control me-4")}}
+        </div>
+      </div>
+      {% else %}
+      <div class="d-flex flex-row mb-3 justify-content-evenly">
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.industry.label}}
+          </label>
+          {{form.industry(class="form-control me-4")}}
+        </div>
+        <div class="d-flex flex-column pe-1 me-1">
+          <label class="text-capitalize">
+            {{form.budget.label}}
+          </label>
+          {{form.budget(class="form-control me-4")}}
+        </div>
+      </div>
+      {% endif %}
+      <div class="">
+        {{form.submit(class="form-control me-4", style="background: rgb(255,158,10);background: linear-gradient(137deg,
+        rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);color: white; font-weight: bold;")}}
+      </div>
+      <form>
+</div>
+
+{% endblock %}
