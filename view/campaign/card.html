@@ -1,0 +1,31 @@
+<div class="d-flex justify-content-center align-item-center align-self-center rounded px-3 mx-4 py-5"
+  style="width: 20vw;max-height: 30vh;background-color: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+  <table class="table-borderless rounded mx-3">
+    <tbody>
+      <tr>
+        <th scope="row" class="px-2">Niche</th>
+        <td class="px-3">{{campaign.niche}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-2">Budget</th>
+        <td class="px-3">{{campaign.budget}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-2">Start</th>
+        <td class="px-3">{{campaign.start_date}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-2">End</th>
+        <td class="px-3">{{campaign.end_date}}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-2">Visibility</th>
+        {% if campaign.visibility %}
+        <td class="px-3">Public</td>
+        {% else %}
+        <td class="px-3">Private</td>
+        {% endif %}
+      </tr>
+    </tbody>
+  </table>
+</div>

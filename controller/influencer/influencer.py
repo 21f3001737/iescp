@@ -20,8 +20,8 @@ from wtforms import (
     DateField,
     SelectField
 )
-from sqlalchemy import and_
-
+from sqlalchemy import and_, or_
+from datetime import date
 from controller.base import assign_user
 
 class RegisterInfluencer(FlaskForm):
@@ -48,7 +48,7 @@ class UpdateInfluencer(FlaskForm):
 class SearchForm(FlaskForm):
     query_string = StringField('')
     date = DateField('Date')
-    revenue = DecimalField('Revenue')
+    revenue = DecimalField('Max Revenue')
     search  = SubmitField()
 
 
@@ -59,8 +59,24 @@ class NewAdRequestForm(FlaskForm):
     payment_amount = DecimalField('Payment Amount', validators = [validators.input_required()])
     submit = SubmitField('Done!')
 
+class NegotiateForm(FlaskForm):
+    ad_request_id = IntegerField('', validators=[validators.input_required()])
+    payment_amount = DecimalField('Payment Amount', validators=[validators.input_required()])
+    submit = SubmitField('Update')
+
 def double_niche(niche):
     return niche[0]
+
+def get_monthly_data(ad_requests):
+    months = [0 for i in range(12)]
+    for ad_request in ad_requests:
+        start_month = ad_request.campaign.start_date.month - 1
+        end_month = ad_request.campaign.end_date.month - 1
+        while(start_month != end_month):
+            months[start_month] += int(ad_request.payment_amount)
+            start_month = (start_month + 1) % 12
+    return months
+        
 
 @app.route("/influencer/profile/<influencer_id>", methods=["GET", "POST"])
 def influencer_profile(influencer_id):
@@ -103,8 +119,12 @@ def influencer_register():
 @app.route("/influencer/dashboard")
 def influencer_dashboard():
     if "type" in session.keys() and session["type"] == "Influencer":
-        ad_requests_all = AdRequests.query.filter(AdRequests.influencer_id == session["user"]["id"]).all()
-        return render_template("influencer/dashboard.html", ad_requests = ad_requests_all)
+        ad_requests_all = AdRequests.query.filter(AdRequests.influencer_id == session["user"]["id"])
+        total = ad_requests_all.count()
+        ongoing = ad_requests_all.filter(and_(AdRequests.campaign.has(Campaigns.start_date <= date.today()), AdRequests.campaign.has(Campaigns.end_date >= date.today()))).filter(AdRequests.status != 3).count()
+        new = ad_requests_all.filter(AdRequests.status != 3).filter(AdRequests.status !=2).count()        
+        negotiate_form = NegotiateForm()
+        return render_template("influencer/dashboard.html", today = date.today(), ad_requests = ad_requests_all, negotiate_form = negotiate_form, total = total, ongoing = ongoing, new = new)
     else:
         return redirect(url_for("login"))
 
@@ -115,7 +135,7 @@ def influencer_find():
         ad_request_form = NewAdRequestForm(request.form)
         campaigns = Campaigns.query.filter(Campaigns.visibility==True)
         if request.method == "GET":
-            return render_template("influencer/find.html", search_form = search, ad_request_form = ad_request_form, campaigns = campaigns.all())
+            return render_template("influencer/find.html", search_form = search, ad_request_form = ad_request_form, campaigns = campaigns.all(), today = date.today())
         elif request.method == "POST":
             if search.search.data:
                 campaigns = Campaigns.query.filter(Campaigns.visibility == True)
@@ -124,7 +144,8 @@ def influencer_find():
                 if search.date.data:
                     campaigns = campaigns.filter(and_(Campaigns.start_date <= search.date.data,Campaigns.end_date >= search.date.data)) 
                 if search.revenue.data:
-                    campaigns = campaigns.filter(Campaigns.budget <= search.revenue.data)
+                    print(search.revenue.data)
+                    campaigns = campaigns.filter(Campaigns.budget == float(search.revenue.data))
             elif ad_request_form.submit.data:
                 ad_request = AdRequests()
                 ad_request_form.populate_obj(ad_request)
@@ -133,13 +154,21 @@ def influencer_find():
                 ad_request.status = 1
                 db.session.add(ad_request)
                 db.session.commit()
-            return render_template("influencer/find.html", search_form = search,ad_request_form = ad_request_form, campaigns = campaigns.all())
+            return render_template("influencer/find.html", search_form = search,ad_request_form = ad_request_form, campaigns = campaigns.all(), today = date.today())
     else:
         return redirect(url_for("login"))
 
 @app.route("/influencer/stats")
 def influencer_stats():
     if "type" in session.keys() and session["type"] == "Influencer":
-        return render_template("influencer/stats.html")
+        ad_requests = AdRequests.query.filter(AdRequests.influencer_id == session["user"]["id"])
+        new = ad_requests.filter(or_(AdRequests.status == 0 , AdRequests.status == 1)).count()
+        accepted= ad_requests.filter(AdRequests.status == 2)
+        ongoing = accepted.filter(and_(AdRequests.campaign.has(Campaigns.start_date <= date.today()), AdRequests.campaign.has(Campaigns.end_date >=  date.today()))).count()
+        completed = accepted.filter(AdRequests.campaign.has(Campaigns.end_date <  date.today())).count()
+        rejected = ad_requests.filter(AdRequests.status == 3).count()
+        monthly_data = get_monthly_data(accepted)
+        print(new, completed, ongoing, rejected, monthly_data)
+        return render_template("influencer/stats.html", ad_request_data = [new, ongoing , completed , rejected], monthly_data = monthly_data)
     else:
         return redirect(url_for("login"))

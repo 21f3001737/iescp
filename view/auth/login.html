@@ -3,7 +3,7 @@
 {% block content %}
 {% from 'bootstrap5/form.html' import render_form %}
 
-<div class="container border p-5 align-self-center mt-5 rounded"
+<div class="container border p-5 align-self-center rounded"
   style="width: 500px; background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
   <legend>{{title}}</legend>
   <form name="login_form" method="post" action="{{url_for('login')}}" enctype="multipart/form-data">

@@ -20,9 +20,17 @@ from wtforms import (
     DecimalField,
     DateField,
     BooleanField,
+    SelectField
 )
 
 from controller.base import assign_user
+from sqlalchemy import and_, or_
+from datetime import date
+
+class NegotiateForm(FlaskForm):
+    ad_request_id = IntegerField('', validators=[validators.input_required()])
+    payment_amount = DecimalField('Payment Amount', validators=[validators.input_required()])
+    submit = SubmitField('Update')
 
 class RegisterSponsor(FlaskForm):
     name = StringField('Name', validators = [validators.input_required()])
@@ -41,9 +49,10 @@ class UpdateSponsor(FlaskForm):
     update = SubmitField('Update')
 
 class NewAdRequestForm(FlaskForm):
-    influencer_id = IntegerField('Influencer ID',  render_kw={'disabled':''})
-    messages = StringField('Message')
-    requirements = StringField('Requirements')
+    influencer_id = SelectField('Influencer', validators=[validators.input_required()])
+    campaign_id = SelectField('Campaign', validators=[validators.input_required()])
+    messages = StringField('Message', validators=[validators.input_required()])
+    requirements = StringField('Requirements', validators=[validators.input_required()])
     payment_amount = DecimalField('Payment Amount', validators = [validators.input_required()])
     submit = SubmitField('Done!')
 
@@ -51,9 +60,10 @@ class SearchForm(FlaskForm):
     query_string = StringField('')
     date = DateField('Date')
     revenue = DecimalField('Revenue')
+    niche = StringField('Niche')
     search = SubmitField()
 
-class NewCampaignForm(FlaskForm):
+class CampaignForm(FlaskForm):
     campaign_id = IntegerField('Campaign ID')
     name = StringField('Name', validators = [validators.input_required()])
     description = StringField('Description', validators = [validators.input_required()])
@@ -62,9 +72,23 @@ class NewCampaignForm(FlaskForm):
     budget = DecimalField('Budget', validators = [validators.input_required()])
     visibility = BooleanField('Visible')
     goals = StringField('Goals', validators = [validators.input_required()])
+    niche = StringField('Niche', validators = [validators.input_required()])
     submit = SubmitField('Done!')
 
+def get_id_name(object):
+    return (object.id, object.name)
     
+
+def get_monthly_data(ad_requests):
+    months = [0 for i in range(12)]
+    for ad_request in ad_requests:
+        start_month = ad_request.campaign.start_date.month - 1
+        end_month = ad_request.campaign.end_date.month - 1
+        while(start_month != end_month):
+            months[start_month] += int(ad_request.payment_amount)
+            start_month = (start_month + 1) % 12
+    return months
+        
     
 @app.route("/sponsor/register", methods = ["GET", "POST"])
 def sponsor_register():
@@ -106,15 +130,16 @@ def sponsor_profile(sponsor_id):
 @app.route("/sponsor/dashboard", methods=["GET", "POST"])
 def sponsor_dashboard():
     if "type" in session.keys() and session["type"] == "Sponsor":
-        campaign_form = NewCampaignForm()
+        campaign_form = CampaignForm()
         campaigns = Campaigns.query.filter(Campaigns.sponsor_id == session["user"]["id"]).all()
         ad_requests = []
+        negotiate_form = NegotiateForm()
         for campaign in campaigns:
             ad_requests += campaign.ad_requests
         if request.method == "GET":
-            return render_template("sponsor/dashboard.html", campaigns = campaigns, ad_requests = ad_requests, form=campaign_form)
+            return render_template("sponsor/dashboard.html", today = date.today() , campaigns = campaigns, ad_requests = ad_requests, form=campaign_form, negotiate_form = negotiate_form)
         elif request.method == "POST":
-            if campaign_form.validate_on_submit():
+            if campaign_form.submit.data:
                 new = True 
                 campaign = None
                 if campaign_form.campaign_id.data:
@@ -127,12 +152,13 @@ def sponsor_dashboard():
                     campaign = Campaigns()
                 campaign_form.populate_obj(campaign)
                 campaign.sponsor_id = session["user"]["id"]
+                campaign.flag = False
                 if new :
                     db.session.add(campaign)
                 db.session.commit()
                 return redirect(url_for("sponsor_dashboard"))
             else:
-                return render_template("sponsor/dashboard.html",campaigns = campaigns, ad_requests = ad_requests, form = campaign_form)     
+                return redirect(url_for("sponsor_dashboard"))
     else:
         return redirect(url_for("login"))
 
@@ -141,37 +167,51 @@ def sponsor_find():
     if "type" in session.keys() and session["type"] == "Sponsor":
         search = SearchForm()
         ad_request_form = NewAdRequestForm()
+        campaigns_choice = list(map(get_id_name, Campaigns.query.filter(and_(Campaigns.sponsor_id == session["user"]["id"], and_(Campaigns.end_date >= date.today(), Campaigns.start_date <= date.today())))))
         campaigns = Campaigns.query.filter(Campaigns.visibility == True)
-        influencers = Influencers.query.filter()
+        influencers = Influencers.query
+        ad_request_form.campaign_id.choices = campaigns_choice
+        ad_request_form.influencer_id.choices = list(map(get_id_name, influencers))
         if request.method == "GET":
-            return render_template("sponsor/find.html", form = search,ad_request_form = ad_request_form, search_items = influencers.all() + campaigns.all() )
+            return render_template("sponsor/find.html",today = date.today(), form = search,ad_request_form = ad_request_form, search_items = influencers.all() + campaigns.all() )
         elif request.method == "POST":
             if search.search.data:
-                campaigns = Campaigns.query.filter(or_(Campaigns.visibility == True, Campaigns.id == session["user"]["id"]))
-                influencers = Influencers.query
                 if search.query_string.data:
                     influencers = influencers.filter(Influencers.name.contains(search.query_string.data))
                     campaigns = campaigns.filter(Campaigns.name.contains(search.query_string.data))
                 if search.date.data:
-                    campaigns = campaigns.filter(Campaigns.start_date <= search.date.data).filter(Campaigns.end_date >= search.date.data) 
+                    campaigns = campaigns.filter(and_(Campaigns.start_date <= search.date.data, Campaigns.end_date >= search.date.data)) 
                 if search.revenue.data:
                     campaigns = campaigns.filter(Campaigns.budget <= search.revenue.data)
                     influencers = influencers.filter(Influencers.budget <= search.revenue.data)                    
-            elif ad_request_form.submit_data:
+                if search.niche.data:
+                    campaigns = campaigns.filter(or_(Campaigns.niche.contains(search.niche.data),Campaigns.niche == search.niche.data))
+                    influencers = influencers.filter(or_(Influencers.niche.contains(search.niche.data), Influencers.niche == search.niche.data))
+            elif ad_request_form.submit.data:
                 ad_request = AdRequests()
                 ad_request_form.populate_obj(ad_request)
-                ad_request.campaign_id == session["user"]["id"]
+                print(ad_request_form.influencer_id)
+                print(ad_request_form.influencer_id.data)
+                ad_request.influencer_id = ad_request_form.influencer_id.data
                 ad_request.status = 0
                 db.session.add(ad_request)
                 db.session.commit()
-            return render_template("sponsor/find.html", form = search, ad_request_form = ad_request_form, search_items = influencers.all() + campaigns.all() )
+            return render_template("sponsor/find.html",today = date.today(), form = search, ad_request_form = ad_request_form, search_items = influencers.all() + campaigns.all() )
     else:
         return redirect(url_for("login"))
 
 @app.route("/sponsor/stats")
 def sponsor_stats():
     if "type" in session.keys() and session["type"] == "Sponsor":
-        return render_template("sponsor/stats.html")
+        ad_requests = AdRequests.query.filter(AdRequests.campaign.has(Campaigns.sponsor_id == session["user"]["id"]))
+        new = ad_requests.filter(or_(AdRequests.status == 0 , AdRequests.status == 1)).count()
+        accepted= ad_requests.filter(AdRequests.status == 2)
+        ongoing = accepted.filter(and_(AdRequests.campaign.has(Campaigns.start_date <= date.today()), AdRequests.campaign.has(Campaigns.end_date >=  date.today()))).count()
+        completed = accepted.filter(AdRequests.campaign.has(Campaigns.end_date <  date.today())).count()
+        rejected = ad_requests.filter(AdRequests.status == 3).count()
+        monthly_data = get_monthly_data(accepted)
+        print(new, completed, ongoing, rejected, monthly_data)
+        return render_template("sponsor/stats.html", ad_request_data = [new, ongoing , completed , rejected], monthly_data = monthly_data)
     else:
-        return redirect(url_for("login"))
+        return redirect(url_for("login")) 
 

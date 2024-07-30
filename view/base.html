@@ -29,12 +29,16 @@
         </ul>
         {%if 'type' in session.keys()%}
         <div class="d-flex flex-row">
-          <div class="h1 me-1 pt-1">
+          <a class="h1 me-1 pt-1" href="{{url_for('dashboard')}}">
             <i class="bi bi-person-fill"></i>
-          </div>
+          </a>
           <div class="">
             <div class="font-weight-bold">
+              {% if session["type"] == Admin %}
+              {{ render_nav_item('dashboard', 'Admin') }}
+              {% else %}
               {{ render_nav_item('dashboard', session['user']['name']) }}
+              {% endif %}
             </div>
             <div class="text-capitalize text-muted">
               {{session['type']}}
@@ -65,10 +69,10 @@
     }
 
     .page>* {
-      padding-top: 5vh;
+      margin-top: 12vh;
     }
   </style>
-  <div class="page" style="margin-top:11vh;">
+  <div class="page" style="margin-top:11vh;min-height: 89vh;">
     {% block content %}
     {% endblock %}
   </div>

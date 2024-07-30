@@ -1,30 +1,126 @@
-
 {% extends 'admin/base.html' %}
 
+
+{% macro info_box(number, label) %}
+<div class="bg-light p-4 rounded mx-2" style="width:33%; box-shadow: -10px 10px 10px 1px #e2e2e2;">
+  <div class="font-weight-bold h1">
+    {{number}}
+  </div>
+  <div>
+    {{label}}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro campaign_row(campaign) %}
+<tr>
+  <td style="background-color: white;">{{campaign.name}}</td>
+  <td style="background-color: white;">{{campaign.niche}}</td>
+  <td style="background-color: white;">{{campaign.budget}}</td>
+  {% if campaign.visibility %}
+  <td style="background-color: white;">Public</td>
+  {% else %}
+  <td style="background-color: white;">Private</td>
+  {% endif %}
+  <td style="background-color: white;">
+    <a href="{{url_for('campaign_page', campaign_id = campaign.id)}}" class="btn btn-info pt-1 px-2"
+      style="padding: 0;"><i class="bi bi-eye-fill"></i> </a>
+    <a href="{{url_for('admin_flag',type = 2, id = campaign.id)}}" class="btn btn-danger pt-1 px-2"
+      style="padding: 0;"><i class="bi bi-flag-fill"></i></a>
+  </td>
+</tr>
+{% endmacro %}
+
+
+{% macro user_campaign_row(obj) %}
+<tr>
+  <td style="background-color: white;">{{obj.name}}</td>
+  {% if obj|attr('industry') %}
+  <td style="background-color: white;">Sponsor</td>
+  {% elif obj|attr('category') %}
+  <td style="background-color: white;">Influencer</td>
+  {% else %}
+  <td style="background-color: white;">Campaign</td>
+  {% endif %}
+  {% if obj|attr('industry') %}
+  <td style="background-color: white;">{{obj.industry}}</td>
+  {% elif obj|attr('category') %}
+  <td style="background-color: white;">{{obj.niche}}</td>
+  {% else %}
+  <td style="background-color: white;">{{obj.niche}}</td>
+  {% endif %}
+  </td>
+  <td style="background-color: white;">{{obj.budget}}</td>
+  <td style="background-color: white;">
+    {% if obj|attr('industry') %}
+    <a href="{{url_for('admin_unflag',type = 1, id = obj.id)}}" class="btn btn-success pt-1 px-2" style="padding: 0;"><i
+        class="bi bi-flag"></i></a>
+    {% elif obj|attr('category') %}
+    <a href="{{url_for('admin_unflag',type = 0, id = obj.id)}}" class="btn btn-success pt-1 px-2" style="padding: 0;"><i
+        class="bi bi-flag"></i></a>
+    {% else %}
+    <a href="{{url_for('admin_unflag',type = 2, id = obj.id)}}" class="btn btn-success pt-1 px-2" style="padding: 0;"><i
+        class="bi bi-flag"></i></a>
+    {% endif %}
+  </td>
+</tr>
+{% endmacro %}
+
 {% block content %}
-<div class = "vstack gap-4">
-  <div class="display-4"> Welcome {{session['username']}}!</div>
-  <div class="container-md">
-    <div class="display-6"> Ongoing Campaigns:</div>
-<div class="container-md">
-    {% for i in range(4) %}
-      <div class="border hstack gap-3">
-        <div class="h5">Campaign {{i}}</div>
-        <div class="h6">Progress 10%</div>
-      </div>
-    {% endfor %}
+<div class="d-flex flex-column justify-content-center m-5 mt-3">
+  <div class="banner bg-dark py-4 ps-3 rounded mb-2"
+    style="background: linear-gradient(200deg, rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,195,1) 92%);">
+    <h1 class="ms-4 display-6 text-capitalize" style="color:white; font-weight: bolder;">Hi, Admin</h1>
+  </div>
+  <div class="info d-flex flex-row my-2">
+    {{ info_box(n_users, "Users") }}
+    {{ info_box(n_campaigns, "Campaigns") }}
+    {{ info_box(n_ar, "Ad Requests") }}
+  </div>
+  <div class="p-3 m-2 rounded" style="background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+    <div class="d-flex flex-row justify-content-between">
+      <div class="h2 m-4 mb-2"> Campaigns</div>
+    </div>
+    <div style="height: 24vh; overflow-y: auto;">
+      <table class="listing table">
+        <thead>
+          <tr>
+            <th style="background-color: white;" scope="col">Name</th>
+            <th style="background-color: white;" scope="col">Niche</th>
+            <th style="background-color: white;" scope="col">Budget</th>
+            <th style="background-color: white;" scope="col">Visibility</th>
+            <th style="background-color: white;" scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for campaign in campaigns %}
+          {{campaign_row(campaign)}}
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
-  <div class="container-md">
-    <div class="display-6"> Flagged Users/Campaigns:</div>
-    <div class="container-md">
-    {% for i in range(4) %}
-      <div class="border hstack gap-3">
-        <div class="h5">Campaign {{i}}</div>
-        <div class="h6">Progress 10%</div>
-      </div>
-    {% endfor %}
+  <div class="p-3 m-2 rounded" style="background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+    <div class="h2 m-4 mb-2"> Ad Requests</div>
+    <div style="height: 24vh; overflow-y: auto;">
+      <table class="listing table">
+        <thead>
+          <tr>
+            <th style="background-color: white;" scope="col">Name</th>
+            <th style="background-color: white;" scope="col">Type</th>
+            <th style="background-color: white;" scope="col">Category/Niche</th>
+            <th style="background-color: white;" scope="col">Budget</th>
+            <th style="background-color: white;" scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for flag in flagged %}
+          {{user_campaign_row(flag)}}
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
+
 {% endblock%}

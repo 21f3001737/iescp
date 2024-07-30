@@ -1,3 +1,78 @@
 {% extends 'sponsor/base.html' %}
 {% block content %}
+<div>
+  <div class="h1 pt-3 ps-5"> Your Statistics </div>
+  <div class="d-flex justify-content-evenly align-items-center" style="width:100%;">
+    <div class="monthly-finance-container rounded"
+      style="position: relative; width: 40%; background: white; padding: 2%;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+      <div class="h2"> Monthly Earnings </div>
+      <div style="padding: 4%;">
+        <canvas id="monthlyFinanceChart"></canvas>
+      </div>
+    </div>
+    <div class="request-container rounded"
+      style="position: relative; width: 35%; background: white; padding: 2%;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+      <div class="h2"> Ad Request Distribution </div>
+      <div style="padding: 4%;">
+        <canvas id="requestsChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const request_chart_context = document.getElementById('requestsChart');
+  const request_chart_data = {
+    labels: [
+      'New',
+      'Ongoing',
+      'Completed',
+      'Rejected'
+    ],
+    datasets: [{
+      label: 'Ad Requests',
+      data: {{ad_request_data| safe}},
+  backgroundColor: [
+    'rgb(0, 99, 0)',
+    'rgb(0, 0, 235)',
+    'rgb(255, 205, 86)',
+    'rgb(105, 105, 105)'
+  ],
+    hoverOffset: 4
+    }]
+  };
+  const request_chart = new Chart(request_chart_context, {
+    type: 'pie',
+    data: request_chart_data,
+  });
+  const finance_chart_context = document.getElementById('monthlyFinanceChart');
+  const finance_chart_data = {
+    labels: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ],
+    datasets: [{
+      label: 'Monthly Earnings',
+      data: {{monthly_data| safe}},
+  hoverOffset: 4
+    }]
+  };
+  const finance_chart = new Chart(finance_chart_context, {
+    type: 'bar',
+    data: finance_chart_data,
+  });
+</script>
 {% endblock %}

@@ -1,0 +1,45 @@
+{% from 'macros.html' import ad_request_row with context %}
+
+<div class="d-flex flex-column justify-content-evenly mx-4 mt-4" style="width: 60vw">
+  <div class="banner bg-dark py-4 ps-3 rounded my-2"
+    style="background: linear-gradient(200deg, rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);">
+    <h1 class="ms-4 display-6 text-capitalize" style="color:white; font-weight: bolder;">{{campaign.name}}
+    </h1>
+  </div>
+  <div class="ms-4 mt-3 d-flex flex-row" style="color: grey;"> <b class="d-flex flex-row">
+      <div class="pe-3" style="color:black;"> Description:</div> {{campaign.description}}
+    </b></div>
+  <div class="ms-4" style="color: grey;"> <b class="d-flex">
+      <div class="pe-3" style="color:black;"> Goals: </div> {{campaign.goals}}
+    </b></div>
+  <div class="p-3 m-2 mt-4 rounded" style="background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+    <div class="d-flex flex-row justify-content-between">
+      <div class="h2 mx-2 mb-2"> Ad Requests </div>
+      {% if 'type' in session.keys() and session['type'] == 'Sponsor' %}
+      <button type="button" class="btn" style="font-size: 28px;" data-bs-toggle="modal"
+        data-bs-target="#newAdRequestModal"><i class="bi bi-plus-circle"></i> </button>
+      {% endif %}
+    </div>
+    <div style="height: 30vh; overflow-y: auto;">
+      <table class="listing table">
+        <thead>
+          <tr>
+            <th style="background-color: white;" scope="col">Name</th>
+            <th style="background-color: white;" scope="col">Sponsor</th>
+            <th style="background-color: white;" scope="col">Budget</th>
+            <th style="background-color: white;" scope="col">Status</th>
+            <th style="background-color: white;" scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ad_request in ad_requests %}
+          {{ ad_request_row(ad_request) }}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <table class="listing table">
+  </table>
+</div>

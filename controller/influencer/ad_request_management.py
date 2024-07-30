@@ -18,6 +18,9 @@ from wtforms import (
     IntegerField,
     DecimalField    
 )
+
+from controller.influencer.influencer import NegotiateForm
+
 @app.route("/influencer/accept/<ad_request_id>")
 def influencer_accept_request(ad_request_id):
     if "type" in session.keys() and session["type"] == "Influencer":
@@ -28,12 +31,13 @@ def influencer_accept_request(ad_request_id):
     else:
         return redirect(url_for("login"))
 
-@app.route("/influencer/negotiate/<ad_request_id>/<amount>")
-def influencer_negotiate_request(ad_request_id, amount):
+@app.route("/influencer/negotiate/", methods=["POST"])
+def influencer_negotiate_request():
     if "type" in session.keys() and session["type"] == "Influencer":
-        ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
+        negotiate_form = NegotiateForm(request.form)
+        ad_request = AdRequests.query.filter(AdRequests.id == negotiate_form.ad_request_id.data).first()
         ad_request.status = 1
-        ad_request.payment_amount = amount 
+        ad_request.payment_amount = negotiate_form.payment_amount.data 
         db.session.commit()
         return redirect(url_for("influencer_dashboard"))
     else:

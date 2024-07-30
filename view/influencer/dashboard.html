@@ -5,4 +5,43 @@
   {% include 'influencer/dashboard/profile_card.html' %}
   {% include 'influencer/dashboard/work_showcase.html' %}
 </div>
+
+
+<div class="modal fade" id="negotiateModal" tabindex="-1" aria-labelledby="campaignModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded" style="background: #e6e6e6;">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" enctype="multipart/form-data" action="{{url_for('influencer_negotiate_request')}}"
+        class="modal-body d-flex flex-column justify-content-center">
+        {{ negotiate_form.hidden_tag() }}
+        <div style="display: none;">
+          {{negotiate_form.ad_request_id(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{negotiate_form.payment_amount.label}}
+          </label>
+          {{negotiate_form.payment_amount(class="form-control me-4")}}
+        </div>
+        {{negotiate_form.submit(class="btn btn-primary me-4")}}
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock%}
+
+{% block scripts %}
+<script>
+  const negotiate_payment_modal = document.getElementById('negotiateModal')
+
+  negotiate_payment_modal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    const ad_request_id = button.getAttribute('data-bs-ad-request-id')
+    negotiate_payment_modal.querySelector('#ad_request_id').setAttribute('value', ad_request_id);
+  });
+
+</script>
+{% endblock %}

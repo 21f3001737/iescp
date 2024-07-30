@@ -21,6 +21,8 @@ from wtforms import (
     BooleanField,
     SelectField,
 )
+from datetime import date
+from sqlalchemy import and_
 
 def get_id_and_name(influencer):
     return (influencer.id, influencer.name)
@@ -41,8 +43,8 @@ def campaign_page(campaign_id):
             ad_request_form = NewAdRequestForm()
             if request.method == "GET":
                 ad_request_form.influencer_id.choices = list(map(get_id_and_name,Influencers.query.all()))
-                ad_requests = AdRequests.query.filter(AdRequests.campaign_id == campaign_id)
-                return render_template("campaign/campaign.html", campaign = campaign, ad_requests = ad_requests, form = ad_request_form)
+                ad_requests = AdRequests.query.filter(and_(AdRequests.campaign_id == campaign_id, AdRequests.status == 2)).all()
+                return render_template("campaign/campaign.html", today=date.today(), campaign = campaign, ad_requests = ad_requests, form = ad_request_form)
             else:
                 ad_request = AdRequests()
                 ad_request_form.populate_obj(ad_request)

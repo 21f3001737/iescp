@@ -1,4 +1,4 @@
-{% extends 'sponsor/base.html' %}
+{% extends 'admin/base.html' %}
 {% from 'bootstrap5/form.html' import render_form %}
 
 {% from 'macros.html' import campaign_card with context %}
@@ -23,46 +23,73 @@
         {{influencer.followers}}</div>
       <div class="card-subtitle text-body-secondary"> Followers </div>
     </div>
+    {% if influencer.flag == True %}
     <div class="mt-4">
-      <a href="{{url_for('influencer_profile', influencer_id=influencer.id)}}" class="btn m-2"
-        style="border: 2px solid transparent;border-image: linear-gradient(137deg, rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);border-image-slice: 1;">View</a>
-      <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#newAdRequestModal"
-        data-bs-influencer-id={{influencer.id}}>Hire</button>
+      <a href="{{url_for('admin_unflag',type = 0, id = influencer.id)}}" class="btn btn-outline-success m-2">Unflag</a>
     </div>
+    {% else %}
+    <div class="mt-4">
+      <a href="{{url_for('admin_flag',type = 0, id = influencer.id)}}" class="btn btn-outline-danger m-2">Flag</a>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endmacro %}
 
-{% block navbar %}
-
-{% endblock %}
-
+{% macro sponsor_card(sponsor) %}
+<div class="d-flex m-4 flex-column bg-light rounded align-items-center justify-content-center overflow-hidden"
+  style="width:22rem; height:29rem;">
+  <div class="d-flex flex-column align-items-center justify-content-center">
+    <img class="" style="object-fit: cover; width: 100px; height: 100px;border: solid 1px black; border-radius: 50%;"
+      src="https://i.pinimg.com/564x/8f/5f/79/8f5f796c0d6f0c5dba62d20ec31b78a5.jpg" />
+    <div class="text-center my-3 text-capitalize">{{sponsor.name}}</div>
+    <div class="my-2 d-flex flex-column justify-content-center align-items-center">
+      <div class="card-subtitle text-body-secondary" style="font-weight: bold; font-size: 24px;">
+        {{sponsor.industry}}</div>
+      <div class="card-subtitle text-body-secondary"> Category </div>
+    </div>
+    {% if sponsor.flag == True %}
+    <div class="mt-4">
+      <a href="{{url_for('admin_unflag',type = 1, id = sponsor.id)}}" class="btn btn-outline-success m-2">Unflag</a>
+    </div>
+    {% else %}
+    <div class="mt-4">
+      <a href="{{url_for('admin_flag',type = 1, id = sponsor.id)}}" class="btn btn-outline-danger m-2">Flag</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
 
 {% block content %}
 
 <form name="search_form" class="d-flex flex-row justify-content-start align-items-start" method="post"
-  action="{{url_for('sponsor_find')}}" enctype="multipart/form-data">
-  {{form.hidden_tag()}}
+  action="{{url_for('admin_find')}}" enctype="multipart/form-data">
+  {{search_form.hidden_tag()}}
   <div class="d-flex flex-column p-4" style="width: 20vw; background: white; position: fixed; height: 100%;">
     <div class="display-6 mb-5">Filters: </div>
-    <div>
-      <p class="text-capitalize">
-        {{form.date.name}}
-      </p>
-      {{form.date(class="form-control me-4",style="z-index: 4")}}
+    <div class="d-flex mt-2">
+      <label class="form-label mt-2 me-2">
+        {{search_form.date.label}}
+      </label>
+      {{search_form.date(class="form-control me-4",style="z-index: 4")}}
     </div>
-    <div class="">
-      <p class="text-capitalize">
-        {{form.revenue.name}}
-      </p>
-      {{form.revenue(class="form-control me-4")}}
+    <div class="d-flex mt-2">
+      <label class="form-label mt-2 me-2">
+        {{search_form.revenue.label}}
+      </label>
+      {{search_form.revenue(class="form-control me-4")}}
+    </div>
+    <div class="d-flex mt-2">
+      {{search_form.flag.label}}
+      {{search_form.flag(class="form-check-input ms-4 me-4")}}
     </div>
   </div>
   <div class="pt-5 d-flex flex-column justify-content-center align-items-center flex-grow-1 p-1"
     style="width: 70vw; margin-left: 20vw">
     <div class="d-flex flex-row mb-4" style="box-shadow: -10px 10px 10px 1px #e2e2e2; width: 80%">
-      {{form.query_string(class="form-control rounded", width="60%")}}
-      {{form.search(class_="btn", style="background: rgb(255,158,10);background: linear-gradient(137deg,
+      {{search_form.query_string(class="form-control rounded", width="60%")}}
+      {{search_form.search(class_="btn", style="background: rgb(255,158,10);background: linear-gradient(137deg,
       rgba(255,158,10,1) 5%, rgba(255,10,108,1) 25%, rgba(45,39,255,1) 86%);color: white; font-weight: bold;",
       value="Search")}}
     </div>
@@ -70,45 +97,14 @@
       {% for search_item in search_items %}
       {% if search_item.__class__.__name__ == "Influencers"%}
       {{influencer_card(search_item)}}
+      {% elif search_item.__class__.__name__ == "Sponsors"%}
+      {{sponsor_card(search_item)}}
       {% else %}
       {{campaign_card(search_item)}}
       {% endif %}
       {% endfor %}
     </div>
   </div>
-</form>
+  </search_form>
 
-
-
-<div class="modal fade" id="newAdRequestModal" tabindex="-1" aria-labelledby="newAdRequestLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="newAdRequestModalLabel">New Ad Request</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        {{ render_form(ad_request_form) }}
-      </div>
-    </div>
-  </div>
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-<script>
-
-  const modal = document.getElementById('newAdRequestModal')
-  if (modal) {
-    modal.addEventListener('show.bs.modal', event => {
-      const button = event.relatedTarget
-      const influencer_id = button.getAttribute('data-bs-influencer-id')
-      const modalInfluencerId = modal.querySelector('#influencer_id')
-      const options = Array.from(modalInfluencerId.options);
-      const select_option = options.find(option => option.value === influencer_id)
-      select_option.setAttribute('selected', true);
-    })
-  }
-</script>
-{% endblock %}
+  {% endblock %}

@@ -117,5 +117,7 @@ def dashboard():
             return redirect(url_for("influencer_dashboard"))
         elif session["type"] == "Sponsor":
             return redirect(url_for("sponsor_dashboard"))
+        elif session["type"] == "Admin":
+            return redirect(url_for("admin_dashboard"))
         else:
             return redirect(url_for("login"))
