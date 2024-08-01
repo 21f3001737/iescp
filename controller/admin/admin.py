@@ -22,7 +22,20 @@ from wtforms import (
 )
 from datetime import date
 
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
+
+def get_monthly_data(ad_requests):
+    months = [0 for i in range(12)]
+    for ad_request in ad_requests:
+        start_month = ad_request.campaign.start_date.month - 1 
+        end_month = ad_request.campaign.end_date.month - 1
+        print(ad_request.id, start_month, end_month, ad_request.payment_amount)
+        while(True):
+            months[start_month] += int(ad_request.payment_amount)
+            if start_month == end_month:
+                break
+            start_month = ( start_month + 1 ) % 12
+    return months
 
 class SearchForm(FlaskForm):
     query_string = StringField('')
@@ -42,7 +55,8 @@ def admin_dashboard():
         #.filter(and_(Campaigns.start_date <= date.today(), Campaigns.end_date >= date.today))
         flagged_users = Influencers.query.filter(Influencers.flag == True).all() + Sponsors.query.filter(Sponsors.flag == True).all()
         flagged_campaigns = Campaigns.query.filter(Campaigns.flag == True).all()
-        return render_template("admin/dashboard.html", campaigns = campaigns, flagged = flagged_users + flagged_campaigns, n_campaigns = n_campaigns, n_ar = n_ar, n_users = n_users)
+        ad_requests = AdRequests.query.all()
+        return render_template("admin/dashboard.html", campaigns = campaigns, flagged = flagged_users + flagged_campaigns, n_campaigns = n_campaigns, n_ar = n_ar, n_users = n_users, ad_requests = ad_requests, today = date.today())
     else:
         return redirect(url_for('login'))
 
@@ -72,13 +86,6 @@ def admin_find():
                     influencers = influencers.filter(Influencers.flag == True)
                     sponsors = sponsors.filter(Sponsors.flag == True)
             return render_template("admin/find.html", search_form = search, search_items = campaigns.all() + influencers.all() + sponsors.all())
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/admin/stats")
-def admin_stats():
-    if "type" in session.keys() and session["type"] == "Admin":
-        return render_template("admin/stats.html")
     else:
         return redirect(url_for('login'))
 
@@ -151,3 +158,30 @@ def admin_unflag(type, id):
                 return render_template('error.html', error_code=501, error_message="Internal Server Error")
     else:
         return redirect(url_for('login'))
+
+@app.route("/admin/ad_request/reject/<ad_request_id>")
+def admin_reject_request(ad_request_id):
+    ad_request = AdRequests.query.filter(AdRequests.id == ad_request_id).first()
+    if "type" in session.keys() and session["type"] == "Admin":
+        ad_request.status = 3
+        db.session.commit()
+        return redirect(url_for("admin_dashboard"))
+    else:
+        return redirect(url_for("login"))
+
+
+@app.route("/admin/stats")
+def admin_stats():
+    if "type" in session.keys() and session["type"] == "Admin":
+        ad_requests = AdRequests.query
+        new = ad_requests.filter(or_(AdRequests.status == 0 , AdRequests.status == 1)).count()
+        accepted= ad_requests.filter(AdRequests.status == 2)
+        ongoing = accepted.filter(and_(AdRequests.campaign.has(Campaigns.start_date <= date.today()), AdRequests.campaign.has(Campaigns.end_date >=  date.today()))).count()
+        completed = accepted.filter(AdRequests.campaign.has(Campaigns.end_date <  date.today())).count()
+        rejected = ad_requests.filter(AdRequests.status == 3).count()
+        monthly_data = get_monthly_data(accepted)
+        print(new, completed, ongoing, rejected, monthly_data)
+        return render_template("admin/stats.html", ad_request_data = [new, ongoing , completed , rejected], monthly_data = monthly_data)
+    else:
+        return redirect(url_for("login")) 
+

@@ -70,13 +70,15 @@ def double_niche(niche):
 def get_monthly_data(ad_requests):
     months = [0 for i in range(12)]
     for ad_request in ad_requests:
-        start_month = ad_request.campaign.start_date.month - 1
+        start_month = ad_request.campaign.start_date.month - 1 
         end_month = ad_request.campaign.end_date.month - 1
-        while(start_month != end_month):
+        print(ad_request.id, start_month, end_month, ad_request.payment_amount)
+        while(True):
             months[start_month] += int(ad_request.payment_amount)
-            start_month = (start_month + 1) % 12
+            if start_month == end_month:
+                break
+            start_month = ( start_month + 1 ) % 12
     return months
-        
 
 @app.route("/influencer/profile/<influencer_id>", methods=["GET", "POST"])
 def influencer_profile(influencer_id):
@@ -106,6 +108,7 @@ def influencer_register():
             if influencer_form.password.data == influencer_form.repeat_password.data:
                 influencer = Influencers()
                 influencer_form.populate_obj(influencer)
+                influencer.flag = False
                 db.session.add(influencer)
                 db.session.commit()            
                 session["type"] = "Influencer"

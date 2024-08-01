@@ -87,9 +87,44 @@
         <h1 class="modal-title fs-5" id="newAdRequestModalLabel">New Ad Request</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        {{ render_form(ad_request_form) }}
-      </div>
+      <form method="post" enctype="multipart/form-data" action="{{url_for('sponsor_dashboard')}}"
+        class="modal-body d-flex flex-column justify-content-center">
+        {{ ad_request_form.hidden_tag() }}
+        <div style="display: none;">
+          {{ad_request_form.ad_request_id(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.influencer_id.label}}
+          </label>
+          {{ad_request_form.influencer_id(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.campaign_id.label}}
+          </label>
+          {{ad_request_form.campaign_id(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.messages.label}}
+          </label>
+          {{ad_request_form.messages(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.requirements.label}}
+          </label>
+          {{ad_request_form.requirements(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.payment_amount.label}}
+          </label>
+          {{ad_request_form.payment_amount(class="form-control me-4")}}
+        </div>
+        {{ad_request_form.submit(class="btn btn-primary me-4")}}
+      </form>
     </div>
   </div>
 </div>

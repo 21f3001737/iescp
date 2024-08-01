@@ -35,7 +35,8 @@
   <td style="background-color: white;">{{ad_request.campaign.sponsor.name}}</td>
   {% endif %}
   <td style="background-color: white;">{{ad_request.payment_amount}}</td>
-  {% if (ad_request.status == 0 and session["type"] == "Influencer") or (ad_request.status == 1 and session["type"] ==
+  {% if "type" in session.keys() and (ad_request.status == 0 and session["type"] == "Influencer") or (ad_request.status
+  == 1 and session["type"] ==
   "Sponsor") %}
   <td style="background-color: white;">
     <div class="bg-danger-subtle text-danger font-weight-bold rounded p-1 text-center">
@@ -65,7 +66,8 @@
     -
     {% endif %}
   </td>
-  {% elif (ad_request.status == 1 and session["type"] == "Influencer") or (ad_request.status == 0 and session["type"] ==
+  {% elif "type" in session.keys() and (ad_request.status == 1 and session["type"] == "Influencer") or
+  (ad_request.status == 0 and session["type"] ==
   "Sponsor")%}
   <td style="background-color: white;">
     <div class="bg-warning-subtle text-warning font-weight-bold rounded p-1 text-center">
@@ -83,12 +85,31 @@
       session["user"]["id"] %}
       <a class='btn btn-danger pt-1 px-2' style="padding: 0;"
         href="{{url_for('sponsor_reject_request', ad_request_id=ad_request.id)}}"><i class="bi bi-x"></i></a>
+      <button type="button" class='btn btn-warning pt-1 px-2' style="padding: 0;" data-bs-toggle="modal"
+        data-bs-target="#adRequestModal" data-bs-ad-request-id="{{ad_request.id}}"
+        data-bs-ad-request-influencer-id="{{ad_request.influencer_id}}"
+        data-bs-ad-request-campaign-id="{{ad_request.campaign_id}}"
+        data-bs-ad-request-payment-amount={{ad_request.payment_amount}}
+        data-bs-ad-request-message="{{ad_request.messages}}"
+        data-bs-ad-request-requirements="{{ad_request.requirements}}"><i class="bi bi-pencil-square"></i></button>
       {% else %}
       -
       {% endif %}
       {% else %}
       Archived
       {% endif %}
+  </td>
+  {% elif "type" in session.keys() and session["type"] == "Admin" and (ad_request.status == 0 or ad_request.status ==
+  1)%}
+  <td style="background-color: white;">
+    <div class="bg-warning-subtle text-warning font-weight-bold rounded p-1 text-center">
+      <b>
+        Negotiation </b>
+    </div>
+  </td>
+  <td style="background-color: white;">
+    <a class='btn btn-danger pt-1 px-2' style="padding: 0;"
+      href="{{url_for('admin_reject_request', ad_request_id=ad_request.id)}}"><i class="bi bi-x"></i></a>
   </td>
   {% elif ad_request.status == 2%}
   <td style="background-color: white;">
@@ -100,7 +121,7 @@
   <td style="background-color: white;">
     {% if ad_request.campaign.start_date <= today and ad_request.campaign.end_date>= today%}
       {% if "type" in session.keys() and session["type"] == "Influencer" and ad_request.influencer_id ==
-      session["user"]["info"]%}
+      session["user"]["id"]%}
       <a class='btn btn-danger pt-1 px-2' style="padding: 0;"
         href="{{url_for('influencer_reject_request', ad_request_id=ad_request.id)}}"><i class="bi bi-x"></i></a>
       {% elif "type" in session.keys() and session["type"] == "Sponsor" and ad_request.campaign.sponsor.id ==

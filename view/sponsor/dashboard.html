@@ -134,24 +134,71 @@
           </div>
           <div class="d-flex form-check pt-5 mx-5">
             {{form.visibility(class="form-check-input")}}
-            <label class="text-capitalize form-check-label">
+            <label class="text-capitalize form-check-label" for="visibility">
               Public
             </label>
           </div>
         </div>
         <div class="mb-3">
-          <label class="text-capitalize">
+          <label class="text-capitalize" for="niche">
             {{form.niche.label}}
           </label>
           {{form.niche(class="form-control me-4")}}
         </div>
         <div class="mb-3">
-          <label class="text-capitalize">
+          <label class="text-capitalize" for="goals">
             {{form.goals.label}}
           </label>
           {{form.goals(class="form-control me-4")}}
         </div>
         {{form.submit(class="btn btn-primary me-4")}}
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="adRequestModal" tabindex="-1" aria-labelledby="adRequestModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded" style="background: #e6e6e6;">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="adRequestModalHeading">Update Ad Request</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" enctype="multipart/form-data" action="{{url_for('sponsor_dashboard')}}"
+        class="modal-body d-flex flex-column justify-content-center">
+        {{ ad_request_form.hidden_tag() }}
+        <div style="display: none;">
+          {{ad_request_form.ad_request_id(class="form-control me-4")}}
+        </div>
+        <div style="display: none;">
+          {{ad_request_form.payment_amount(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.influencer_id.label}}
+          </label>
+          {{ad_request_form.influencer_id(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.campaign_id.label}}
+          </label>
+          {{ad_request_form.campaign_id(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.messages.label}}
+          </label>
+          {{ad_request_form.messages(class="form-control me-4")}}
+        </div>
+        <div class="mb-3">
+          <label class="text-capitalize">
+            {{ad_request_form.requirements.label}}
+          </label>
+          {{ad_request_form.requirements(class="form-control me-4")}}
+        </div>
+        {{ad_request_form.submit(class="btn btn-primary me-4")}}
       </form>
     </div>
   </div>
@@ -224,6 +271,22 @@
       modal.querySelector('#visibility').setAttribute('checked', false);
       modal.querySelector('#niche').setAttribute('value', '');
       modal.querySelector('#goals').setAttribute('value', '');
+    })
+  }
+  const ad_request_modal = document.getElementById('adRequestModal');
+  console.log(ad_request_modal);
+  if (ad_request_modal) {
+    ad_request_modal.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget
+      const ad_request_id = button.getAttribute('data-bs-ad-request-id')
+      if (ad_request_id) {
+        ad_request_modal.querySelector('#ad_request_id').setAttribute('value', button.getAttribute('data-bs-ad-request-id'));
+        Array.from(ad_request_modal.querySelector('#influencer_id').options).find(option => option.value === button.getAttribute('data-bs-ad-request-influencer-id')).setAttribute('selected', true);
+        Array.from(ad_request_modal.querySelector('#campaign_id').options).find(option => option.value === button.getAttribute('data-bs-ad-request-campaign-id')).setAttribute('selected', true);
+        ad_request_modal.querySelector('#messages').setAttribute('value', button.getAttribute('data-bs-ad-request-message'));
+        ad_request_modal.querySelector('#requirements').setAttribute('value', button.getAttribute('data-bs-ad-request-requirements'));
+        ad_request_modal.querySelector('#payment_amount').setAttribute('value', button.getAttribute('data-bs-ad-request-payment-amount'));
+      }
     })
   }
 </script>

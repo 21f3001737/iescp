@@ -1,5 +1,6 @@
 {% extends 'admin/base.html' %}
 
+{% from 'macros.html' import ad_request_row with context %}
 
 {% macro info_box(number, label) %}
 <div class="bg-light p-4 rounded mx-2" style="width:33%; box-shadow: -10px 10px 10px 1px #e2e2e2;">
@@ -101,7 +102,30 @@
     </div>
   </div>
   <div class="p-3 m-2 rounded" style="background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
-    <div class="h2 m-4 mb-2"> Ad Requests</div>
+    <div class="d-flex flex-row justify-content-between">
+      <div class="h2 m-4 mb-2"> Ad Requests</div>
+    </div>
+    <div style="height: 24vh; overflow-y: auto;">
+      <table class="listing table">
+        <thead>
+          <tr>
+            <th style="background-color: white;" scope="col">Name</th>
+            <th style="background-color: white;" scope="col">Niche</th>
+            <th style="background-color: white;" scope="col">Budget</th>
+            <th style="background-color: white;" scope="col">Visibility</th>
+            <th style="background-color: white;" scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ad_request in ad_requests %}
+          {{ad_request_row(ad_request)}}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="p-3 m-2 rounded" style="background: white;box-shadow: -10px 10px 10px 1px #d2d2d2;">
+    <div class="h2 m-4 mb-2"> Flagged Users/Campaigns</div>
     <div style="height: 24vh; overflow-y: auto;">
       <table class="listing table">
         <thead>
