@@ -22,7 +22,7 @@ from wtforms import (
     SelectField,
 )
 from datetime import date
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 def get_id_and_name(influencer):
     return (influencer.id, influencer.name)
@@ -39,11 +39,16 @@ class NewAdRequestForm(FlaskForm):
 def campaign_page(campaign_id):
     campaign = Campaigns.query.filter(Campaigns.id == campaign_id).first()
     if campaign:
-        if campaign.visibility == True or ("type" in session.keys() and session["type"] == "Sponsor" and session["id"] == campaign.sponsor_id):
+        owned = False
+        if "type" in session.keys() and session["type"] == "Sponsor" and session["user"]["id"] == campaign.sponsor_id:
+            owned = True
+        if campaign.visibility == True or owned:
             ad_request_form = NewAdRequestForm()
             if request.method == "GET":
                 ad_request_form.influencer_id.choices = list(map(get_id_and_name,Influencers.query.all()))
                 ad_requests = AdRequests.query.filter(and_(AdRequests.campaign_id == campaign_id, AdRequests.status == 2)).all()
+                if owned:
+                    ad_requests = ad_requests + AdRequests.query.filter(and_(AdRequests.campaign_id == campaign_id, AdRequests.campaign.has(Campaigns.sponsor_id == session["user"]["id"]))).all()
                 return render_template("campaign/campaign.html", today=date.today(), campaign = campaign, ad_requests = ad_requests, form = ad_request_form)
             else:
                 ad_request = AdRequests()

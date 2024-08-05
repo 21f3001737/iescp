@@ -6,6 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <meta content="{{ csrf_token() }}" name="csrf-token" />
   {% block styles %}
   {{ bootstrap.load_css() }}
   {% endblock %}

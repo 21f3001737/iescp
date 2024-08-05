@@ -87,7 +87,7 @@
         <h1 class="modal-title fs-5" id="newAdRequestModalLabel">New Ad Request</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="post" enctype="multipart/form-data" action="{{url_for('sponsor_dashboard')}}"
+      <form method="post" enctype="multipart/form-data" action="{{url_for('sponsor_find')}}"
         class="modal-body d-flex flex-column justify-content-center">
         {{ ad_request_form.hidden_tag() }}
         <div style="display: none;">

@@ -104,6 +104,7 @@ def influencer_register():
     if request.method == "GET":
         return render_template("auth/register.html",title="Influencer Registration", form = influencer_form, influencer=True)
     elif request.method == "POST":
+        print(dict(request.headers))
         if influencer_form.validate_on_submit():
             if influencer_form.password.data == influencer_form.repeat_password.data:
                 influencer = Influencers()
@@ -114,8 +115,8 @@ def influencer_register():
                 session["type"] = "Influencer"
                 session["user"] = assign_user(influencer)
                 return redirect(url_for("influencer_dashboard"))
-            return render_template("error.html", error_code=404, error_message="Page Not Found")
-        return render_template("error.html", error_code=404, error_message="Page Not Found")
+            return render_template("error.html", error_code=404, error_message="Passwords did not match")
+        return render_template("error.html", error_code=404, error_message="Could not Validate")
     else:
         return render_template("error.html", error_code=404, error_message="Page Not Found")
 

@@ -24,18 +24,27 @@ class AdRequestsAPI(Resource):
     @marshal_with(ad_request_output)
     def post(self, ad_request_id):
         args = create_ad_request_parser.parse_args()
-        name = args.get("name", str)
-        industry = args.get("industry", str)
-        budget = args.get("budget", float)
+        campaign_id = args.get("campaign_id", int)
+        influencer_id = args.get("influencer_id", int)
+        messages = args.get("messages", str)
+        requirements = args.get("requirements", str)
+        payment_amount = args.get("payment_amount", float)
+        status = args.get("status", int)
 
-        if name is None:
-            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Name is required", error_code= "SC1001")
-        elif industry is None:
-            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Industry is required", error_code= "SC1002")
-        elif budget is None:
-            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Budget is required", error_code= "SC1003")
+        if campaign_id is None:
+            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Campaign ID is required", error_code= "ADC1001")
+        elif influencer_id is None:
+            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Influencer ID is required", error_code= "ADC1002")
+        elif messages is None:
+            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Messages is required", error_code= "ADC1003")
+        elif requirements is None:
+            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Requirements is required", error_code= "ADC1004")
+        elif payment_amount is None:
+            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Payment Amount is required", error_code= "ADC1005")
+        elif status is None:
+            raise CreationError(status_code = 400, object_type = "AdRequest", status_message="Status is required", error_code= "ADC1006")
         else:
-            ad_request = AdRequests(name=name, industry = industry, budget = budget)
+            ad_request = AdRequests(campaign_id = campaign_id, influencer_id = influencer_id, messages = messages, requirements = requirements, payment_amount = payment_amount, status = status)
             db.session.add(ad_request)
             db.session.commit()
             return ad_request

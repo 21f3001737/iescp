@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 def add_dummy_data():
-    add_dummy_admin()
     add_dummy_influencers()
     add_dummy_sponsors()
     add_dummy_campaigns()

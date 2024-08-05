@@ -44,7 +44,7 @@ class RegisterSponsor(FlaskForm):
 class UpdateSponsor(FlaskForm):
     name = StringField('Name', validators=[validators.input_required()])
     username = StringField('Username', validators=[validators.input_required()])
-    category = StringField('Category', validators = [validators.input_required()])
+    industry = StringField('Industry', validators = [validators.input_required()])
     budget = DecimalField('Budget', validators = [validators.input_required()])
     update = SubmitField('Update')
 
@@ -74,7 +74,7 @@ class CampaignForm(FlaskForm):
     visibility = BooleanField('Visible')
     goals = StringField('Goals', validators = [validators.input_required()])
     niche = StringField('Niche', validators = [validators.input_required()])
-    submit = SubmitField('Done!')
+    add = SubmitField('Done!')
 
 def get_id_name(object):
     return (object.id, object.name)
@@ -110,8 +110,8 @@ def sponsor_register():
                 session["type"] = "Sponsor"
                 session["user"] = assign_user(sponsor)
                 return redirect(url_for("sponsor_dashboard"))
-            return render_template("error.html", error_code=404, error_message="Page Not Found")
-        return render_template("error.html", error_code=404, error_message="Page Not Found")
+            return render_template("error.html", error_code="", error_message="Passwords did not match")
+        return render_template("error.html", error_code="", error_message="Could Not Validate Form")
     else:
         return render_template("error.html", error_code=404, error_message="Page Not Found")
 
@@ -149,7 +149,11 @@ def sponsor_dashboard():
         if request.method == "GET":
             return render_template("sponsor/dashboard.html", today = date.today() , campaigns = campaigns.all(), ad_requests = ad_requests, form=campaign_form, negotiate_form = negotiate_form, ad_request_form= ad_request_form)
         elif request.method == "POST":
-            if campaign_form.submit.data and campaign_form.validate_on_submit():
+            print(campaign_form.add)
+            print(campaign_form.add.data)
+            print(ad_request_form.submit)
+            print(ad_request_form.submit.data)
+            if campaign_form.add.data:
                 new = True 
                 campaign = None
                 if campaign_form.campaign_id.data:

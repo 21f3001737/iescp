@@ -4,20 +4,27 @@ sponsor_output = {
     "id": fields.Integer,
     "name": fields.String,
     "username": fields.String,
+    "password": fields.String,
     "industry": fields.String,
     "budget": fields.Float,
+    "flag": fields.Boolean
 }
 
 influencer_output = {
     "id": fields.Integer,
     "name": fields.String,
     "username": fields.String,
+    "password": fields.String,
     "category": fields.String,
+    "niche": fields.String,
+    "followers": fields.Integer,
     "budget": fields.Float,
+    "flag": fields.Boolean
 }
 
 campaign_output = {
     "id": fields.Integer,
+    "sponsor_id": fields.Integer,
     "name": fields.String,
     "description": fields.String,
     "start_date": fields.DateTime,
@@ -25,6 +32,8 @@ campaign_output = {
     "budget": fields.Float,
     "visibility": fields.Boolean,
     "goals": fields.String,
+    "niche": fields.String,
+    "flag": fields.Boolean
 }
 
 ad_request_output = {
